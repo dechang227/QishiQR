@@ -7,7 +7,7 @@ from datetime import datetime
 
 class df_reader:
     '''
-    Read ticks from csv files
+    Read ticks from all csv files satisfying some patterns in a directory
     '''
     
     def __init__(self, filepat, topdir, offset=0, freq='30S'):
@@ -16,7 +16,7 @@ class df_reader:
         self._offset  = offset
         self._freq    = freq
 
-    def get_tick(self, raw=True):
+    def get_tick(self, raw=False):
         """ Get ticks from csv file
         Args:
             raw: boolean. Whether to return raw tick or the forward filled data.
@@ -66,7 +66,7 @@ class df_reader:
     
         df.sort_values(by=[dt], inplace=True)
     
-        df.drop([f1, f2], axis=1, inplace=True)
+        # df.drop([f1, f2], axis=1, inplace=True)
     
         df.set_index(dt, inplace=True)
 
