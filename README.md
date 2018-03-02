@@ -34,4 +34,4 @@ df_reader('bu1601*', topdir='../tick2016/bu/day/').get_tick(raw=false)
 | 2016-01-04 09:00:30 | bu1601         | 2.01601e+07 | 1.45187e+12 |        1706 |        1724 |       1702 |        0 |          0 |          70 |     1.2012e+06 |            -1 |          22666 |        1708 |           0 |           0 |           0 |           0 |            8 |            0 |            0 |            0 |            0 |        1706 |           0 |           0 |           0 |           0 |            1 |            0 |            0 |            0 |            0 |     -1 |           1716 |              1812 |              1606 | 09:00:30.000 |
 
 
-__use_case__: df_reader(filepat='ag1712*', topdir='../ag/day', offset=5, freq='30S'), where offset is in minutes and frequency is in 30 seconds.
+__use_case__: df_reader(filepat='ag1712*', topdir='../ag/day', offset=5, freq='30S'), where offset is in minutes (offset=5 means that it starts 5 minutes after opening 9 AM) and frequency is in 30 seconds.
