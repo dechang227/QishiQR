@@ -4,10 +4,12 @@ import os
 import fnmatch
 
 from datetime import datetime
+from datetime import timedelta  
 
 class df_reader:
     '''
-    Read ticks from all csv files satisfying some patterns in a directory
+    Read ticks from all csv files satisfying some patterns in a directory.
+    offset in minutes.
     '''
     
     def __init__(self, filepat, topdir, offset=0, freq='30S'):
@@ -57,7 +59,7 @@ class df_reader:
     #                 Methods about reading f-filled tick                     # 
     #-------------------------------------------------------------------------#
         
-    def create_dt_conv_num(self, df, ID='InstrumentID', f1='Date', f2='UpdateTime', dt='dt'):
+    def create_dt(self, df, ID='InstrumentID', f1='Date', f2='UpdateTime', dt='dt'):
         '''create datetime and convert to numeric values.'''
     
         # create datetime as index
@@ -72,32 +74,45 @@ class df_reader:
 
         # drop duplicate index
         df = df[~df.index.duplicated(keep='last')]
-        
-        # convert to nuemric values
-        #num_col = [col for col in df.columns if col!=ID and col!=dt]
-    
-        #df[num_col] = df[num_col].convert_objects(convert_numeric=True)
-    
+            
         return df
 
+    def clean_df(self, df, cols=['AveragePrice', 'LastPrice', 'AskPrice1', 'AskVolume1', \
+                                 'BidPrice1', 'BidVolume1']):
+    
+        '''Clean the dataframe - postive prcies/volume quote.
+        '''
+        for c in cols:
+            df = df[df[c]>0]
+    
+        return df
+        
     def f_fill(self, filename):
         '''read in the data from filename, create time series index, forward fill the data.
         then return dataframe given offset, and at selected freq.'''
         
+        # read in data
         df = pd.read_csv(filename)
     
-        dates = filename.split('_')[1].split('.')[0]
-    
-        index1=pd.date_range(dates+' 09:00:00.0', dates+' 11:30:00.0', freq='500L')
-        index2=pd.date_range(dates+' 13:30:00.0', dates+' 15:00:00.5', freq='500L')
+        # clean data
+        df = self.clean_df(df)
+
+        dates = filename.split('_')[-1].split('.')[0]
+       
+        # add offset in minutes
+        start = pd.to_datetime(dates +' 09:00:00.0') + timedelta(minutes=self._offset)
+        
+        index1=pd.date_range(start, dates+' 11:30:00.0', freq=self._freq)
+        index2=pd.date_range(dates+' 13:30:00.0', dates+' 15:00:00.5', freq=self._freq)
         index=index1.append(index2)
     
-        df = self.create_dt_conv_num(df)
+        df = self.create_dt(df)
                 
-        #print (filename, len(df))
-    
-        return df.reindex(index, method='ffill').resample(self._freq).asfreq().dropna()
-
+        # reindex and forward fill, start from offset position
+        
+        df = df.reindex(index, method='ffill')
+        
+        return df.dropna()
     
     def gen_df(self, filenames):
         '''
