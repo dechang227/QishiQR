@@ -35,3 +35,7 @@ df_reader('bu1601*', topdir='../tick2016/bu/day/').get_tick(raw=false)
 
 
 __use_case__: df_reader(filepat='ag1712*', topdir='../ag/day', offset=5, freq='30S'), where offset is in minutes (offset=5 means that it starts 5 minutes after opening 9 AM) and frequency is in 30 seconds.
+
+
+### Obtain night ticks
+__use_case__: df_reader(filepat='ag1712*', topdir='../ag/night', offset=5, freq='30S', session = 'Night'), default value for session is 'Day'
