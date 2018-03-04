@@ -12,11 +12,12 @@ class df_reader:
     offset in minutes.
     '''
     
-    def __init__(self, filepat, topdir, offset=0, freq='30S'):
+    def __init__(self, filepat, topdir, offset=0, freq='30S', session = 'Day'):
         self._filepat = filepat
         self._topdir  = topdir
         self._offset  = offset
         self._freq    = freq
+        self._session = session
 
     def get_tick(self, raw=False):
         """ Get ticks from csv file
@@ -93,25 +94,27 @@ class df_reader:
         
         # read in data
         df = pd.read_csv(filename)
-    
+        
         # clean data
         df = self.clean_df(df)
-
+  
         dates = filename.split('_')[-1].split('.')[0]
        
         # add offset in minutes
-        start = pd.to_datetime(dates +' 09:00:00.0') + timedelta(minutes=self._offset)
-        
-        index1=pd.date_range(start, dates+' 11:30:00.0', freq=self._freq)
-        index2=pd.date_range(dates+' 13:30:00.0', dates+' 15:00:00.5', freq=self._freq)
-        index=index1.append(index2)
+        if self._session == 'Day':
+            start = pd.to_datetime(dates +' 09:00:00.0') + timedelta(minutes=self._offset)        
+            index1=pd.date_range(start, dates+' 11:30:00.0', freq=self._freq)
+            index2=pd.date_range(dates+' 13:30:00.0', dates+' 15:00:00.5', freq=self._freq)
+            index=index1.append(index2)
+        else:
+            index=pd.date_range(dates +' 18:00:00.0', dates +' 23:30:00.5', freq=self._freq) + timedelta(hours = 3)
     
         df = self.create_dt(df)
-                
+
         # reindex and forward fill, start from offset position
         
         df = df.reindex(index, method='ffill')
-        
+
         return df.dropna()
     
     def gen_df(self, filenames):
@@ -126,7 +129,7 @@ class df_reader:
             
             df = df.append(tmp)     
         
-            #print (tmp.head())
+            #print (len(tmp))
             
         return df.sort_index()
     
