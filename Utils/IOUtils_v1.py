@@ -2,7 +2,6 @@ import pandas as pd
 import sys
 import os
 import fnmatch
-
 from datetime import datetime
 from datetime import timedelta  
 
@@ -18,7 +17,7 @@ class df_reader:
         self._offset  = offset
         self._freq    = freq
         self._day     = day
-        self._symbol  = symbol
+        self._symbol  = symbol.lower()
 
     def get_tick(self, raw=False):
         """ Get ticks from csv file
@@ -63,7 +62,6 @@ class df_reader:
         
     def create_dt(self, df, ID='InstrumentID', f1='Date', f2='UpdateTime', dt='dt'):
         '''create datetime index.'''
-    
         # create datetime as index
         df[dt] = df[f1].astype(str) + " " + df[f2].astype(str)
         df[dt] = pd.to_datetime(df[dt], format="%Y%m%d %H:%M:%S.%f")
@@ -95,35 +93,45 @@ class df_reader:
         
         # read in data
         df = pd.read_csv(filename)
-    
+        # Obtain the trading dates in the file
+        dates = [str(day) for day in df['Date'].unique()]  
+        self.dates = dates
+        print(dates)
         # clean data
         df = self.clean_df(df)
 
-        dates = filename.split('_')[-1].split('.')[0]
        
         # add offset in minutes
         if self._day:  # day time
-            start = pd.to_datetime(dates +' 09:00:00.0') + timedelta(minutes=self._offset)
-        
-            index1=pd.date_range(start, dates+' 11:30:00.0', freq=self._freq)
+            start = pd.to_datetime(dates[0] +' 09:00:00.0') + timedelta(minutes=self._offset)
+            index1=pd.date_range(start, dates[0]+' 11:30:00.0', freq=self._freq)
             
-            start_aft = pd.to_datetime(dates +' 13:30:00.0') + timedelta(minutes=self._offset)
-            index2=pd.date_range(start_aft, dates+' 15:00:00.5', freq=self._freq)
+            start_aft = pd.to_datetime(dates[0] +' 13:30:00.0') + timedelta(minutes=self._offset)
+            index2=pd.date_range(start_aft, dates[0]+' 15:00:00.5', freq=self._freq)
             
             index=index1.append(index2)
         else:    
-            # night time: 21 pm - 23 pm: rb
-            if self._symbol == 'rb':
-                start = pd.to_datetime(dates +' 21:00:00.0') + timedelta(minutes=self._offset)
-                index=pd.date_range(start, dates+' 23:00:00.0', freq=self._freq)
-            else:
+            # night start time: 21pm for all 4 kinds of future assets
+            night_start = ' 21:00:00.0'
+            # night start time:
+            night_end = {
+                'ag': ' 2:30:00.0',        # Ag: 02:30am
+                'bu': ' 1:00:00.0',        # Bu: 01:00am
+                'rb': ' 23:00:00.0',        # Rb: 23:00pm
+                'ru': ' 23:00:00.0',        # Ru: 23:00pm
+                'zn': ' 1:00:00.0'         # Zn: 01:00am
+            }
+
+            try:
+                start = pd.to_datetime(dates[0] + night_start) + timedelta(minutes=self._offset)
+                index=pd.date_range(start, dates[-1] + night_end[self._symbol], freq=self._freq)
+            except KeyError:
                 print ('Symbol {} not recoginized !!!'.format(self._symbol))
                 sys.exit()
     
         df = self.create_dt(df)
                 
         # reindex and forward fill, start from offset position
-        
         df = df.reindex(index, method='ffill')
         
         return df.dropna()

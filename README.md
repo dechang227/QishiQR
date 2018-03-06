@@ -43,4 +43,8 @@ __use_case__: df_reader(filepat='ag1712*', topdir='../ag/night', offset=5, freq=
 
 ### Obtain day/night, and symbol: in branch IO_v1
 
-__use_case__: IOUtils_v1.df_reader(filepat='rb1712*', topdir='../rb/day', offset=1./60., freq='2T', day=True, symbol='rb').get_tick(), where the start time is 09:00:01 AM. The night trade is implemented for 'rb' only. Add other symbols as needed.
+__use_case__: IOUtils_v1.df_reader(filepat='rb1712*', topdir='../rb/day', offset=1./60., freq='2T', day=True, symbol='rb').get_tick(), where the start time is 09:00:01 AM. The night trade is implemented for all four symbols. 
+
+## TODO
+* Automatically extract symbol from csv files
+* Automatically extract day/night trading from csv files
