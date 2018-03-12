@@ -45,8 +45,8 @@ for commodity in ['bu']:
     print('='*15 + commodity + '='*15)
     data_path = data_root_dir + '/' + commodity + '/' + commodity
 
-    #for exp_date in sorted(list(set([x[2:6] for x in os.listdir(data_path+'/day')]))):
-    for exp_date in ['1601', '1602']:
+    for exp_date in sorted(list(set([x[2:6] for x in os.listdir(data_path+'/day')]))):
+    #for exp_date in ['1601', '1602']:
 
         print('-'*10 + 'Running:' + exp_date + '-'*10)
         instrument = commodity + exp_date
@@ -82,4 +82,4 @@ for commodity in ['bu']:
         word_prob_all = word_prob_all.append(tmp)
 
     word_prob_all = word_prob_all[['prior', '0', '1', '2', 'total', 'max', 'max_pct']]
-    word_prob_all.to_csv(output_path + 'test_freq.csv', index=False)
+    word_prob_all.to_csv(output_path + '_'.join([commodity, freq]) + '_freq.csv', index=False)
