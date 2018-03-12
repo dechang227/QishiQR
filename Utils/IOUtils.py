@@ -94,11 +94,7 @@ class df_reader:
         # read in data
         df = pd.read_csv(filename)
         if df.empty:
-<<<<<<< HEAD
             print(filename + " is empty")
-=======
-            print(filename + " is empty.")
->>>>>>> 5c58fc51eecd3e40d0b18d257c0172fedf2a5b30
             return df
         # Obtain the trading dates in the file
         dates = [str(day) for day in df['Date'].unique()]  
