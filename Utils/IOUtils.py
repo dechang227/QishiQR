@@ -11,12 +11,12 @@ class df_reader:
     offset in minutes.
     '''
     
-    def __init__(self, filepat, topdir, offset=0, freq='30S', session='Day', symbol='rb'):
+    def __init__(self, filepat, topdir, offset=0, freq='30S', day=True, symbol='rb'):
         self._filepat = filepat
         self._topdir  = topdir
         self._offset  = offset
         self._freq    = freq
-        self._session = session.lower()
+        self._day     = day
         self._symbol  = symbol.lower()
 
     def get_tick(self, raw=False):
@@ -94,17 +94,22 @@ class df_reader:
         # read in data
         df = pd.read_csv(filename)
         if df.empty:
+<<<<<<< HEAD
+            print(filename + " is empty")
+=======
             print(filename + " is empty.")
+>>>>>>> 5c58fc51eecd3e40d0b18d257c0172fedf2a5b30
             return df
         # Obtain the trading dates in the file
         dates = [str(day) for day in df['Date'].unique()]  
         self.dates = dates
+        print(dates)
         # clean data
         df = self.clean_df(df)
 
        
         # add offset in minutes
-        if self._session == 'day':  # day time
+        if self._day:  # day time
             start = pd.to_datetime(dates[0] +' 09:00:00.0') + timedelta(minutes=self._offset)
             index1=pd.date_range(start, dates[0]+' 11:30:00.0', freq=self._freq)
             
