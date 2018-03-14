@@ -175,7 +175,7 @@ class df_reader:
             tick_sequence: Tick sequences to be searched
             pattern: pattern to be searched.
         """
-        return len(re.findall(r"(?={0})".format(pattern)))
+        return len(re.findall(r"(?={0})".format(pattern), tick_sequence))
     
     def gen_find(self):
         '''
