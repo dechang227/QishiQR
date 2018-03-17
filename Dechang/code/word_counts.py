@@ -33,7 +33,7 @@ output_path = 'D:/GitHub/QishiQR/Dechang/output/'
 freq = '5min' #data frequency
 n = 8  #degree of model
 
-for commodity in ['bu']:
+for commodity in ['ag']:
     # dictionary to save word counts for each commodity
     word_counts_dict = {}
     for l in np.arange(1, n):
@@ -63,10 +63,10 @@ for commodity in ['bu']:
         tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
         #print(tick_all_sequence)
         for l in np.arange(1, n):
-            # for k in np.arange(3 ** l):
-            #     word_counts_dict[l][ternary(k, l)] += tick_all_sequence.count(ternary(k, l))
-            for i in np.arange(len(tick_all_sequence)-l+1):
-                word_counts_dict[l][tick_all_sequence[i:(i+l)]] += 1
+            for k in np.arange(3 ** l):
+                 word_counts_dict[l][ternary(k, l)] += df_reader.count_word(tick_all_sequence, ternary(k, l))
+            #for i in np.arange(len(tick_all_sequence)-l+1):
+            #    word_counts_dict[l][tick_all_sequence[i:(i+l)]] += 1
 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
@@ -83,3 +83,4 @@ for commodity in ['bu']:
 
     word_prob_all = word_prob_all[['prior', '0', '1', '2', 'total', 'max', 'max_pct']]
     word_prob_all.to_csv(output_path + '_'.join([commodity, freq]) + '_freq.csv', index=False)
+
