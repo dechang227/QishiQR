@@ -107,11 +107,11 @@ class df_reader:
        
         # add offset in minutes
         if self._day:  # day time
-            start = pd.to_datetime(dates[0] +' 09:00:00.0') + timedelta(minutes=self._offset)
+            start = pd.to_datetime(dates[0] + ' 09:00:00.0') + timedelta(minutes=self._offset)
             index1 = pd.date_range(start, dates[0]+' 10:15:00.0', freq=self._freq)
-            start_mid = pd.data_range(start, dates[0]+' 10:30:00.0') + timedelta(minutes=self._offset)
-            index2 = pd.data_range(start_mid, dates[0]+' 11:30:00.0', freq=self._freq)
-            start_aft = pd.to_datetime(dates[0] +' 13:30:00.0') + timedelta(minutes=self._offset)
+            start_mid = pd.to_datetime(start, dates[0]+' 10:30:00.0') + timedelta(minutes=self._offset)
+            index2 = pd.date_range(start_mid, dates[0]+' 11:30:00.0', freq=self._freq)
+            start_aft = pd.to_datetime(dates[0] + ' 13:30:00.0') + timedelta(minutes=self._offset)
             index3 = pd.date_range(start_aft, dates[0]+' 15:00:00.5', freq=self._freq)
             
             index = index1.append(index2).append(index3)
