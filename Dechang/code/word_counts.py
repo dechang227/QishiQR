@@ -33,7 +33,7 @@ output_path = 'D:/GitHub/QishiQR/Dechang/output/'
 freq = '5min' #data frequency
 n = 8  #degree of model
 
-for commodity in ['ag']:
+for commodity in ['bu']:
     # dictionary to save word counts for each commodity
     word_counts_dict = {}
     for l in np.arange(1, n):
@@ -46,7 +46,7 @@ for commodity in ['ag']:
     data_path = data_root_dir + '/' + commodity + '/' + commodity
 
     for exp_date in sorted(list(set([x[2:6] for x in os.listdir(data_path+'/day')]))):
-    #for exp_date in ['1601', '1602']:
+    #for exp_date in ['1612']:
 
         print('-'*10 + 'Running:' + exp_date + '-'*10)
         instrument = commodity + exp_date
@@ -60,7 +60,10 @@ for commodity in ['ag']:
         ax.plot(tick_all['LastPrice'], label=exp_date)
 
         tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > 0 else (1 if x < 0 else 0))
-        tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
+        tick_all.to_csv(output_path + '_'.join([commodity, exp_date, freq]) + '.csv', index=False)
+
+        tick_all_sequence = tick_all['Direction'].loc[tick_all.index < '2016-07-01 09:00:00'].astype(str).str.cat()
+        #tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
         #print(tick_all_sequence)
         for l in np.arange(1, n):
             for k in np.arange(3 ** l):
@@ -73,7 +76,7 @@ for commodity in ['ag']:
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.xlabel('Time')
 
-    fig.savefig(output_path + '_'.join([commodity, freq]) + '_v2.png')
+    fig.savefig(output_path + '_'.join([commodity, freq]) + '.png')
     plt.show()
 
     word_prob_all = pd.DataFrame()
