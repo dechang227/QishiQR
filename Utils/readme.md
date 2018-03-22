@@ -9,6 +9,7 @@
 given commodity, expiration list, freq (minutes), and interval for incremental offset, 
 for example here the starting time is 0, 0.5, ...., 4.5 minutes after trade start.
 
+### note the training period is before 2016-7-1, and valid period is between 2016 3rd quarter.
 
 
 
