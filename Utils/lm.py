@@ -139,7 +139,6 @@ class LM_model:
         # 1. t-score in training set
         lm_stats['max_train'] = np.round(lm_stats['max_train_mean'])
         lm_stats['t_score_train'] = (lm_stats['max_train_mean'] - lm_stats['max_train'])*np.sqrt(num)/lm_stats['max_train_std']
-        lm_stats['pvalue_train'] = stats.t.sf(lm_stats['t_score_train'], np.round(lm_stats['max_train']))*2
         
         # 2. Welch t-test between train and valid sets.
         lm_stats['dof'] = (lm_stats['max_train_std']**2/num+lm_stats['max_valid_std']**2/num)**2/ \
@@ -148,10 +147,13 @@ class LM_model:
         lm_stats['t_score'] = (lm_stats['max_train_mean']-lm_stats['max_valid_mean'])/np.sqrt(lm_stats['max_train_std']**2/num \
                     + lm_stats['max_valid_std']**2/num)
         
-        lm_stats['pvalue_cx'] = stats.t.sf(lm_stats['t_score'], np.round(lm_stats['dof']))*2
-        
-        # nan p-value indicates zero std
+        # nan p-value indicates zero std, = zero t-score
         lm_stats.fillna(value=0, inplace=True)
+        
+        # extract two-sided t-test p-value
+        lm_stats['pvalue_train'] = stats.t.sf(lm_stats['t_score_train'], num-1)*2
+
+        lm_stats['pvalue_cx'] = stats.t.sf(lm_stats['t_score'], np.round(lm_stats['dof']))*2
         
         return lm_stats
     
