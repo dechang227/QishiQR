@@ -9,7 +9,8 @@
 given commodity, expiration list, freq (minutes), and interval for incremental offset, 
 for example here the starting time is 0, 0.5, ...., 4.5 minutes after trade start.
 
-### note the training period is before 2016-7-1, and validation period is between 2016 3rd quarter.
+### 1. The training period is before 2016-7-1, and validation period is between 2016 3rd quarter.
 
+### 2. The t-test is performed on the 'max' = most probable subsequent state. It might also be useful to look at 'max_pct' = likelihood of most probable state.
 
 
