@@ -7,7 +7,7 @@
 `lm1 = model1.run(commodity='rb', exp_list=['1701'], freq=5, interval=0.5)`
 
 given commodity, expiration list, freq (minutes), and interval for incremental offset, 
-for example here the starting time is 0, 0.5, ...., 4.5 minutes.
+for example here the starting time is 0, 0.5, ...., 4.5 minutes after trade start.
 
 
 
