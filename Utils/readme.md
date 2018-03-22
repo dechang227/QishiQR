@@ -16,5 +16,5 @@ for example here the starting time is 0, 0.5, ...., 4.5 minutes after trade star
 ### 3. The t-test is performed on the 'max' = most probable subsequent state for training set, and between training set and validation set. It might also be useful to look at 'max_pct' = likelihood of most probable state when 'max' state is the same in training and validation sets.
 
 
-### 4. columns in lm1: move (prior),	max_train_mean,	max_valid_mean,	max_train_std,	max_valid_std,	max_train,	t_score_train,	pvalue_train,	dof (number of data for comparison, here = 10 in the example),	t_score,	pvalue_cx
+### 4. columns in lm1: move (prior),	max_train_mean,	max_valid_mean,	max_train_std,	max_valid_std,	max_train,	t_score_train,	pvalue_train,	dof (degree of freedom in test for training and validation sets),	t_score,	pvalue_cx
 
