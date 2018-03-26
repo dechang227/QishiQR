@@ -42,37 +42,3 @@ class SLMStrategy(Strategy):
         #set last point before closing to be 0
         #set the first m points after opening to be 0
         return self.data
-
-
-if __name__ == "__main__":
-    data_dir = '../tests/'
-    data = pd.read_csv(data_dir + 'ag_1712_5min.csv')
-    slm = pd.read_csv(data_dir + 'ag_5min_freq.csv')[['prior', 'max']]
-    slm = slm.rename(columns={'max': 'signal'})
-    signals = SLMStrategy(data, slm, 5).generatingsignal()
-    signals['match'] = signals.apply(lambda row: 1 if row['signal'] == row['Direction'] else 0, axis=1)
-    #print(signals['match'].describe())
-    signals.to_csv(data_dir + 'ag_5min_signal.csv', index=False)
-
-    """
-    test paper strategy for SHA index
-    """
-    sha_data = pd.read_csv(data_dir + 'sha000001.csv')
-    sha_data['Date'] = pd.to_datetime(sha_data['Date'], format="%m/%d/%Y")
-    sha_data = sha_data[(sha_data['Date'] >= '2005-01-04') & (sha_data['Date'] <= '2013-12-31')]
-    sha_data = sha_data.sort_values(by=['Date'])
-    sha_strategy = pd.read_csv(data_dir + 'sha_strategy_6.csv')
-    sha_signals = SLMStrategy(sha_data, sha_strategy, 5, price='ClosePrice').generatingsignal()
-    sha_signals['change_pct'] = sha_signals['change_pct'].astype(float)
-    sha_signals['strategy'] = sha_signals.apply(lambda row: row['change_pct'] if row['signal']==2 else (-1*row['change_pct'] if row['signal']==1 else 0), axis=1)
-    sha_signals['cum_gain'] = sha_signals['strategy'].cumsum()
-    sha_signals.to_csv(data_dir + 'sha_strategy_gain.csv')
-    fig, ax1 = plt.subplots()
-    ax1.plot(sha_signals['ClosePrice'])
-    ax2 = ax1.twinx()
-    ax2.plot(sha_signals['cum_gain'], color='red')
-    fig.tight_layout()
-    plt.show()
-
-
-
