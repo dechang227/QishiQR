@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 
-class vectorizedbacktest(object):
+class vectorized_backtest(object):
     def __init__(self, data, tca = 'None'):
         self.data = data # price history data
         self.tca = tca # trading cost to be applied
         self.result = 'please run backtest first'
         self.performance = 'please calculate performance first'
- 
+
     def runtest(self):
         self.result = self.data
         self.result['tradeID'] = (~(self.result['signal']==self.result['signal'].shift(1))).cumsum()
@@ -24,10 +24,9 @@ class vectorizedbacktest(object):
         if(self.tca == 'Fixed' or self.tca == 'Compound'):
             self.result['strategy'] = self.result['strategy']-0.00012*(self.result['signal_bar']!=0)
             
- 
         return self.result
  
-    def calperformance(self):
+    def cal_performance(self):
         self.result['benchmark'] = self.result['return'].cumsum() + 1
         self.result['equitycurve'] = self.result['strategy'].cumsum() + 1
         self.result['drawdown'] = self.result['equitycurve']/(self.result['equitycurve'].expanding().max())-1
