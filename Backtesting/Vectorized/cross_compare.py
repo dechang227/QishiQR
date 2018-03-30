@@ -11,9 +11,7 @@ class ensembler:
 
         Args:
             backtester: the back tester
-            para_list: iterable that includes dicts of parameters.
-                       Example: [{'file':'Ag_20160101', 'Language_Order': 2},
-                                 {'file':'Ag_20160102', 'Language_Order': 3}]
+            signasl: Signals to used in the backtester.
         """
         self.backtester = tester
         self.signals = signals
@@ -45,16 +43,18 @@ class ensembler:
 
     def run(self):
         """
-        Run all the backtesters in the ensembles. We assume that each tester has method
-        tester.run(), and it will return a pd.DataFram that includes the backtesting results
+        Run all the backtesters in the ensembles. 
 
         Returns:
-            pd.DataFrame, the backtesting results
+            lists of the backtesting results with different signals
         """
         self.results = [tester.runtest() for tester in self.ensembles]
         return self.results
 
     def cal_performance(self):
+        """
+        Analyze the performance
+        """
         [tester.cal_performance() for tester in self.ensembles]
         try:
             self.performance = pd.DataFrame([tester.performance for tester in self.ensembles], index=self.labels)
@@ -62,7 +62,16 @@ class ensembler:
         except:
             print('Failed to build the performance DataFrame')
 
-    def plot(self, target_col="equitycurve", ax=None, **kwargs):
+    def plot(self, target_col="equitycurve", ax=None):
+        """
+        Make plots
+
+        Args:
+            target_col: str. The name of values to be plotted.
+            ax: matplotlib.axes. Axes of the target plot.
+        Return:
+            ax: return the figure axes.
+        """
         if ax is None:
             fig = plt.figure()
             ax = plt.gca()
