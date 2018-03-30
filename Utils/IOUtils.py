@@ -100,7 +100,7 @@ class df_reader:
         # Obtain the trading dates in the file
         dates = [str(day) for day in df['Date'].unique()]  
         self.dates = dates
-        print(dates)
+        #print(dates)
         # clean data
         df = self.clean_df(df)
 
