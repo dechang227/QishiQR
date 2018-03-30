@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from .backend import vectorized_backtest
+from .backtest import vectorizedbacktest
 
 class ensembler:
     def __init__(self, tester, signals, tcas=None, labels=None):
@@ -35,9 +35,9 @@ class ensembler:
 
         # TODO: May change to generator to save memory
         if self.tcas is not None:
-            self.ensembles = [vectorized_backtest(signal, tca) for signal, tca in zip(self.signals, self.tcas)]
+            self.ensembles = [vectorizedbacktest(signal, tca) for signal, tca in zip(self.signals, self.tcas)]
         else:
-            self.ensembles = [vectorized_backtest(signal) for signal in self.signals]
+            self.ensembles = [vectorizedbacktest(signal) for signal in self.signals]
 
         return self.ensembles
 
@@ -51,11 +51,11 @@ class ensembler:
         self.results = [tester.runtest() for tester in self.ensembles]
         return self.results
 
-    def cal_performance(self):
+    def calperformance(self):
         """
         Analyze the performance
         """
-        [tester.cal_performance() for tester in self.ensembles]
+        [tester.calperformance() for tester in self.ensembles]
         try:
             self.performance = pd.DataFrame([tester.performance for tester in self.ensembles], index=self.labels)
             self.performance.index.name = 'Model Order'
