@@ -4,7 +4,7 @@ Created on Tue Mar 20 21:08:46 2018
 
 """
 
-from IOUtils import * 
+from .IOUtils import * 
 
 import pandas as pd
 import numpy as np
@@ -79,7 +79,6 @@ class LM_model:
                 print ('Unknown flg')
                 sys.eixt()
             
-
             tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > 0 else (1 if x < 0 else 0))
             tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
             #print(tick_all_sequence)
