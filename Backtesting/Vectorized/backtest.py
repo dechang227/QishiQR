@@ -1,7 +1,10 @@
 import numpy as np
 import pandas as pd
+from Utils.IOUtils import *
+from Strategy import *
 
-class vectorizedbacktest(object):
+
+class vectorizedbacktest:
     def __init__(self, data, tca = 'None'):
         self.data = data # price history data
         self.tca = tca # trading cost to be applied
@@ -39,7 +42,11 @@ class vectorizedbacktest(object):
         vol = daily_returns.std() * ((250)**0.5)
         average_daily_return = daily_returns.mean()
         total_return = self.result['equitycurve'].iloc[-1]
-        sharpe = (average_daily_return * 250)/ vol
+        with np.errstate(divide='raise'):
+            try:
+                sharpe = (average_daily_return * 250) / vol
+            except Warning:
+                sharpe = 0
         
         #average_daily_excess_return = daily_exess_return.mean()
         #excess_vol = daily_excess_return.std() * ((250)**0.5)
@@ -73,3 +80,14 @@ class vectorizedbacktest(object):
         #'Information Ratio':ir,
         'Largest Winning Trade': max_trade, 
         'Largest Losing Trade': min_trade}
+
+    @staticmethod
+    def compile_data(DATA_DIR, commodity, exp_date, offset=0, freq='5min', start='20160701', end='20161031'):
+        instrument = commodity + exp_date
+        tick_day = df_reader(instrument + '*', topdir=DATA_DIR + commodity + '/day', offset=offset, freq=freq,day=True, symbol=commodity).get_tick(raw=False)
+        tick_night = df_reader(instrument + '*', topdir=DATA_DIR + commodity + '/night', offset=offset, freq=freq, day=False, symbol=commodity).get_tick(raw=False)
+
+        tick_all = pd.concat([tick_day, tick_night])
+        tick_all.sort_index(inplace=True)
+        return tick_all[(tick_all.index >= start) & (tick_all.index < end)]
+
