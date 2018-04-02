@@ -4,7 +4,7 @@ Created on Tue Mar 20 21:08:46 2018
 
 """
 
-from IOUtils import * 
+from Utils.IOUtils import *
 
 import pandas as pd
 import numpy as np
@@ -12,14 +12,11 @@ import sys
 
 
 class LM_model:
-    
-        
-        
-    def __init__(self, m=3, n=8, data_root_dir = r'..\Qishi_QR'):
-        
+    def __init__(self, m=3, n=8, data_root_dir = r'../../Data', output = r'../../Output'):
         self._m = m # states
         self._n = n # length of words
         self._data_root_dir = data_root_dir
+        self._output = output
     
     def ternary (self, k, l):
         if k == 0:
@@ -56,7 +53,7 @@ class LM_model:
 
 
         print('='*12 + commodity + ' '+ flg + '='*12)
-        data_path = self._data_root_dir + '/' + commodity 
+        data_path = self._data_root_dir + '/' + commodity
 
         #for exp_date in sorted(list(set([x[2:6] for x in os.listdir(data_path+'/day')]))):
         for exp_date in exp_list:
@@ -69,12 +66,13 @@ class LM_model:
 
             tick_all = pd.concat([tick_day, tick_night])
             tick_all.sort_index(inplace=True)
-            
+
+            tick_all.to_csv(self._output + '/' + '_'.join([commodity, exp_date, freq, str(offset)]) + '.csv')
             # select train data: hard coded.
             if flg=='train':
-                tick_all = tick_all[tick_all.index < '2016-7-1']
+                tick_all = tick_all[tick_all.index < '2016-7-1 09:00:00.0']
             elif flg=='valid':
-                tick_all = tick_all[(tick_all.index >= '2016-7-1') & (tick_all.index < '2016-10-1')]
+                tick_all = tick_all[(tick_all.index >= '2016-7-1 09:00:00.0') & (tick_all.index < '2016-10-1 09:00:00.0')]
             else:
                 print ('Unknown flg')
                 sys.eixt()
@@ -105,7 +103,7 @@ class LM_model:
         prob_all = pd.DataFrame()
                
         for offset in np.arange(0, freq, interval):
-            print (str(offset)+'min')
+            print(str(offset)+'min')
             tmp = self.LM(commodity=commodity, exp_list=exp_list, offset = float(offset), freq=str(freq)+'min', flg=flg)
             
             prob_all = prob_all.append(tmp)
