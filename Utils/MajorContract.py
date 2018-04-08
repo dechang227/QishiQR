@@ -13,17 +13,17 @@ class MajorContracts():
     ''' Generate the time series of major contracts for given commodity.
     '''
     
-    def __init__(self, symbol='rb', maturity={'1605':['2015-11-1','2016-3-1'],
+    def __init__(self, symbol='rb', topdir=r'../data', maturity={'1605':['2015-11-1','2016-3-1'],
                                               '1609':['2016-3-1','2016-6-1'],
                                               '1701':['2016-7-1','2016-11-1'],
                                               '1705':['2016-11-1','2017-3-1']},
                         **kwargs):
         
         self._symbol  = symbol
-        self._topdir  = kwargs.get('topdir', r'../data')
+        self._topdir  = topdir
         self._offset  = kwargs.get('offset', 0.1)
         self._freq    = kwargs.get('freq', 15)       
-        self._transitions  = kwargs.get('transitions', None)  # 
+        self._transitions  = kwargs.get('transitions', None)  # transition time between major contracts
         
         self._maturity = maturity
         
@@ -42,12 +42,14 @@ class MajorContracts():
             tick_all.sort_index(inplace=True)
             
             tick_all = tick_all[(tick_all.index >= trade_range[0]) & (tick_all.index < trade_range[1])]
+
+            tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > 0 else (1 if x < 0 else 0))
             
             majorcontracts = majorcontracts.append(tick_all)
             
-        return majorcontracts
+        return majorcontracts.sort_index(inplace=True)
     
-    # todo: add overlapping maturities, calculate probability table
+    # todo: add overlapping trade_range, use transition information to switch major contracts; and calculate probability table.
     
     
     
