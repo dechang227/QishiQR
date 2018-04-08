@@ -61,8 +61,9 @@ class ensembler:
         """
         [tester.calperformance() for tester in self.ensembles]
         try:
-            self.performance = pd.DataFrame([tester.performance for tester in self.ensembles], index=self.labels)
-            self.performance.index.name = 'Model Order'
+            self.performance = pd.DataFrame([tester.performance for tester in self.ensembles])
+            if not self.labels:
+                self.performance.index = labels
         except:
             print('Failed to build the performance DataFrame')
         return self.performance
@@ -100,9 +101,10 @@ def compile_signal(data, slm, max_order=8):
 
 
 class tester:
-    def __init__(self, DATA_DIR, OUTPUT_DIR):
+    def __init__(self, DATA_DIR, OUTPUT_DIR, prob_table):
         self._DATA_DIR = DATA_DIR
         self._OUTPUT_DIR = OUTPUT_DIR
+        self.prob_table = prob_table
 
     def build(self, commodity, exp_date, model_order=7, freq='5min', offset=0, start='20160701', end='20161031', tca=None):
         self.config = {
@@ -115,10 +117,6 @@ class tester:
             'end_day': end,
             'tca': tca
         }
-
-        
-        self.slm = LM_model(data_root_dir=str(self._DATA_DIR),n=model_order)
-        self.prob_table = self.slm.LM(commodity=commodity, exp_list=[exp_date], offset=offset, flg='train') # TODO: Fix the training period
 
         self.test_data = vectorizedbacktest.compile_data(self._DATA_DIR, commodity, exp_date,   start = start, end=end)
         signals = compile_signal(self.test_data, self.prob_table, max_order=model_order)

@@ -1,0 +1,13 @@
+{
+    "Root path": "/home/rz14/Documents/QR_Qishi/QishiQR/",
+    "Tick path": "/home/rz14/Documents/QR_Qishi/tick2016/",
+    "Strategy path": "/home/rz14/Documents/QR_Qishi/Strategy/",
+    "Validate path": "/home/rz14/Documents/QR_Qishi/Validate/",
+    "Output path": "/home/rz14/Documents/QR_Qishi/QishiQR/Output/",
+    
+    "State number": 3,
+    "Max model order": 7,
+    "Frequency": 5,
+    "Offset": 0,
+    "TCA": -1
+}

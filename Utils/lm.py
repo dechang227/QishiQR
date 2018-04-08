@@ -163,3 +163,16 @@ class LM_model:
         num = round(freq/interval)
         
         return self.t_tests(df_train, df_valid, num)
+
+
+
+
+def gen_strategy(commodity, exp_list, m, n, flg='train', freq=5, interval=1, data_root_dir=r'../../Data', output=r'../../Output'):
+    strategy = None
+    lm_model = LM_model(m=m, n=n, data_root_dir=data_root_dir,output=output)
+    strategy = lm_model.LM_set(commodity, exp_list=exp_list, flg=flg, freq=freq, interval=interval)
+    return strategy
+
+
+
+

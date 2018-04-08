@@ -26,7 +26,8 @@ class vectorizedbacktest:
         #  
         if(self.tca == 'Fixed' or self.tca == 'Compound'):
             self.result['strategy'] = self.result['strategy']-0.00012*(self.result['signal_bar']!=0)
-            
+        
+        self.result.index = self.data.index
         return self.result
  
     def calperformance(self):
@@ -80,14 +81,3 @@ class vectorizedbacktest:
         #'Information Ratio':ir,
         'Largest Winning Trade': max_trade, 
         'Largest Losing Trade': min_trade}
-
-    @staticmethod
-    def compile_data(DATA_DIR, commodity, exp_date, offset=0, freq='5min', start='20160701', end='20161031'):
-        instrument = commodity + exp_date
-        tick_day = df_reader(instrument + '*', topdir=DATA_DIR + commodity + '/day', offset=offset, freq=freq,day=True, symbol=commodity).get_tick(raw=False)
-        tick_night = df_reader(instrument + '*', topdir=DATA_DIR + commodity + '/night', offset=offset, freq=freq, day=False, symbol=commodity).get_tick(raw=False)
-
-        tick_all = pd.concat([tick_day, tick_night])
-        tick_all.sort_index(inplace=True)
-        return tick_all[(tick_all.index >= start) & (tick_all.index < end)]
-

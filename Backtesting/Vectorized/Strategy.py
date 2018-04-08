@@ -1,7 +1,7 @@
 import copy
 import pandas as pd
 import numpy as np
-
+from Utils.lm import *
 
 class Strategy:
     """
@@ -38,7 +38,6 @@ class MovingAverageStrategy(object):
         self.data['slowma'] = self.data['Adj. Open'].rolling(window=self.long_window).mean()
         self.data = self.data.dropna()
         self.data['signal'] = np.where(self.data['fastma'] > self.data['slowma'], 1, -1)
-
         return self.data
 
 
@@ -63,14 +62,11 @@ class SLMStrategy(Strategy):
         prior_ls = ['p'] * self.m + ['p' + sequence[i:i + self.m] for i in np.arange(len(sequence) - self.m)]
         # print(len(prior_ls))
         self.data['prior'] = prior_ls
-        self.data = pd.merge(self.data, self.slm[['prior', 'signal']], left_on=['prior'], right_on=['prior'],
-                             how='left')
+        # self.data = pd.merge(self.data, self.slm[['prior', 'signal']], left_on=['prior'], right_on=['prior'],
+        #                      how='left')
+        self.data = self.data.reset_index().merge(self.slm[['prior', 'signal']],left_on=['prior'], right_on=['prior'],
+                             how='left').set_index('index')
         self.data['signal'] = self.data['signal'].fillna(0).astype(int)
         #set last point before closing to be 0
         #set the first m points after opening to be 0
         return self.data
-
-
-
-
-

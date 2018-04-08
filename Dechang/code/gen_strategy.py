@@ -12,5 +12,3 @@ ag_contracts = ['1601', '1602', '1603', '1604', '1605', '1606', '1607', '1608', 
                 '1702', '1703', '1704', '1705', '1706', '1707', '1708', '1709', '1710', '1711', '1712']
 ag_strategy = lm_model.LM_set(commodity='ag', exp_list=ag_contracts, flg='train', freq=5, interval=1)
 ag_strategy.to_csv(r'../../Strategy/ag_5min_strategy_t.csv', index=False)
-
-
