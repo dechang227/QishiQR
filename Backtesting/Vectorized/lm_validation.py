@@ -42,8 +42,27 @@ class LmValidation:
                 validator_ensemble = ensembler(vectorizedbacktest, signals)
                 validator_ensemble.build()
                 validator_ensemble.run()
+
+                fig = plt.figure()
+                #benchmark = validator_ensemble.results[0]['return'].cumsum() + 1
+                benchmark = validator_ensemble.results[0]['LastPrice']
+                #print(len(benchmark.index))
+                initial_value = benchmark[0]
+                benchmark = benchmark/initial_value
+                #print(len(benchmark.index))
+                #plt.plot(benchmark['index'], benchmark['return'])
+                #print(validator_ensemble.results[0].columns.values)
+                benchmark.plot()
+                plt.title('Benchmark')
+                fig.savefig(self._valid_dir + '/benchmark_' + re.sub('.csv', '.png', filename))
+                plt.close()
+
                 performance = validator_ensemble.calperformance()
                 performance.to_csv(self._valid_dir + '/performance_' + filename)
                 validator_ensemble.plot()
                 plt.savefig(self._valid_dir + '/performance_' + re.sub('.csv', '.png', filename))
                 plt.close()
+                # validator_ensemble.plot(target_col="benchmark")
+                # plt.savefig(self._valid_dir + '/benchmark_' + re.sub('.csv', '.png', filename))
+                # plt.close()
+
