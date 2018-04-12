@@ -72,7 +72,7 @@ class ensembler:
             print('Failed to build the performance DataFrame')
         return self.performance
 
-    def plot(self, target_col="equitycurve", ax=None):
+    def plot(self, target_col="equitycurve", target_time = 'date', base_col = 'benchmark', ax=None):
         """
         Make plots
 
@@ -82,17 +82,36 @@ class ensembler:
         Return:
             ax: return the figure axes.
         """
+        datefunc = lambda x: mdates.date2num(datetime.strptime(x, '%m/%d/%Y'))
         if ax is None:
-            fig = plt.figure()
+            fig = plt.figure(figsize = (12,8))
             ax = plt.gca()
         try:
             for result, label in zip(self.results, self.labels):
-                result[target_col].plot(ax=ax, label=label)
+                label_str = 'prior_'+str(label)
+                
+                dates = result[target_time].apply(datefunc)
+                values = result[target_col]
+                
+                ax.plot_date(dates,values,'.', label = label_str)
+                ax.set_title(label)
+            
+            dates = result[target_time].apply(datefunc)
+            values = result[base_col]
+            ax.plot_date(dates,values,'k', label = base_col)
+            ax.set_title(base_col)
+            years = YearLocator()
+            months = MonthLocator()
+            yearsFmt = DateFormatter('%Y')
+            ax.xaxis.set_major_locator(years)
+            ax.xaxis.set_major_formatter(yearsFmt)
+            ax.xaxis.set_minor_locator(months)
+            ax.autoscale_view()
         except IndexError:
             print("Cols not found!")
 
         ax.legend()
-        ax.set_title(target_col)
+        ax.set_title('Future trading strategy performance')
 
         return ax
 
