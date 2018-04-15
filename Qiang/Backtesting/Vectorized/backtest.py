@@ -5,9 +5,10 @@ from Strategy import *
 
 
 class vectorizedbacktest:
-    def __init__(self, data, tca = 'None'):
+    def __init__(self, data, tca = None, opt = None):
         self.data = data # price history data
         self.tca = tca # trading cost to be applied
+        self.opt = opt
         self.result = 'please run backtest first'
         self.performance = 'please calculate performance first'
 
@@ -15,9 +16,11 @@ class vectorizedbacktest:
         self.result = self.data
         self.result['tradeID'] = (~(self.result['signal']==self.result['signal'].shift(1))).cumsum()
         self.result['return'] = np.log(self.result['LastPrice']/self.result['LastPrice'].shift(1))
-        self.result['return'].loc[0] = 0.0
+        self.result['return'][0] = 0.0
         self.result['signal_bar'] = self.result['signal'].apply(lambda x: 1 if x == 2 else (-1 if x == 1 else 0))
-        #self.result['signal_bar'][0] = 0
+        if(self.opt == 'CL'):
+            self.result['signal_bar'] = self.result['signal_bar']*self.result['CL'] 
+        self.result['signal_bar'][0] = 0
         self.result['strategy'] = self.result['return'] * self.result['signal_bar']
  
         # This step is to take into account of transaction cost. For every order, return reduced by half of the spread
@@ -25,9 +28,9 @@ class vectorizedbacktest:
             self.result['strategy'] = self.result['strategy']-0.5*np.log(self.result['AskPrice1']/self.result['BidPrice1'])*(self.result['signal_bar']!=0)
         #  
         if(self.tca == 'Fixed' or self.tca == 'Compound'):
+            #0.00012 is trading cost, 0.0004 is for bid-ask spread to count
             self.result['strategy'] = self.result['strategy']-0.00012*(self.result['signal_bar']!=0)
-        
-        self.result.index = self.data.index
+            
         return self.result
  
     def calperformance(self):
@@ -43,12 +46,8 @@ class vectorizedbacktest:
         vol = daily_returns.std() * ((250)**0.5)
         average_daily_return = daily_returns.mean()
         total_return = self.result['equitycurve'].iloc[-1]
-        with np.errstate(divide='raise'):
-            try:
-                sharpe = (average_daily_return * 250) / vol
-            except Warning:
-                sharpe = 0
-        
+        anual_return = average_daily_return * 250
+        sharpe = np.divide(anual_return, vol, out = np.zeros_like(anual_return), where = vol!=0)
         #average_daily_excess_return = daily_exess_return.mean()
         #excess_vol = daily_excess_return.std() * ((250)**0.5)
         #ir = (average_daily_excess_return * 250)/ excess_vol
@@ -81,3 +80,14 @@ class vectorizedbacktest:
         #'Information Ratio':ir,
         'Largest Winning Trade': max_trade, 
         'Largest Losing Trade': min_trade}
+
+    @staticmethod
+    def compile_data(DATA_DIR, commodity, exp_date, offset=0, freq='5min', start='20160701', end='20161031'):
+        instrument = commodity + exp_date
+        tick_day = df_reader(instrument + '*', topdir=DATA_DIR + commodity + '/day', offset=offset, freq=freq,day=True, symbol=commodity).get_tick(raw=False)
+        tick_night = df_reader(instrument + '*', topdir=DATA_DIR + commodity + '/night', offset=offset, freq=freq, day=False, symbol=commodity).get_tick(raw=False)
+
+        tick_all = pd.concat([tick_day, tick_night])
+        tick_all.sort_index(inplace=True)
+        return tick_all[(tick_all.index >= start) & (tick_all.index < end)]
+
