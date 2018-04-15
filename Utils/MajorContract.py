@@ -6,6 +6,7 @@ Created on Sat Apr  7 20:04:48 2018
 """
 
 import pandas as pd
+import numpy as np
 
 from IOUtils import df_reader
 
@@ -27,8 +28,11 @@ class MajorContracts():
         # transition time between major contracts. eg, 'transitions' = {'1605': '2016-2-1', ...}
         self._transitions  = kwargs.get('transitions', None)  
     
-        
         self._maturity = maturity
+        
+        # states = 3. order = 8.
+        self._m = 3
+        self._n = 8
         
     def create_major(self):
         ''' major contracts without overlap time.'''
@@ -52,16 +56,46 @@ class MajorContracts():
             majorcontracts = majorcontracts.append(tick_all)
             
         return majorcontracts.sort_index()
+
+    
+    def ternary (self, k, l):
+        if k == 0:
+            return '0'*l
+        nums = []
+        while k:
+            k, r = divmod(k, self._m)
+            nums.append(str(r))
+        return ('0'*(l-len(nums))) + ''.join(reversed(nums))    
+    
+    # create word frequency data frame word counts dictionary
+    def word_prob(self, word_counts_dict, l):
+        word_counts = pd.DataFrame(list(word_counts_dict.items()), columns = ['word', 'freq'])
+        word_counts['prior'] = word_counts['word'].str.slice(0, l-1)
+        word_counts['move'] = word_counts['word'].str.slice(l-1, l)
+        word_counts_t = word_counts.pivot(index='prior', columns='move', values='freq')
+        
+        # hard coded for self._m=3
+        
+        word_counts_t['total'] = word_counts_t['0'] + word_counts_t['1'] + word_counts_t['2']
+        word_counts_t['max'] = word_counts_t.loc[:, '0':'2'].idxmax(axis = 1)
+        word_counts_t['max_pct'] = word_counts_t.loc[:, '0':'2'].max(axis = 1)/word_counts_t['total']
+        word_counts_t['prior'] = 'p'+word_counts_t.index.map(str)
+        return word_counts_t
+
     
     def create_major_overlap(self):
         ''' major contracts with overlap time.
+        return dataframe for the concated timeseries and probability table for each major contracts in given time period.
         
         example: 
             
-        rb_mj = MajorContracts(topdir='C:/Qishi_QR/data', maturity={'1609':['2015-11-1','2016-8-1'], \
-                            '1705':['2016-6-1','2017-3-1']}, transitions={'1609':'2016-7-1', '1705':'2017-2-1'}) 
+        rb_mj = MajorContracts(
+                               topdir='C:/Qishi_QR/data', 
+                               maturity={'1609':['2015-11-1','2016-8-1'], '1705':['2016-6-1','2017-3-1']}, 
+                               transitions={'1609':'2016-7-1', '1705':'2017-2-1'}
+                               ) 
         
-        df = rb_mj.create_major_overlap()
+        df, ptb = rb_mj2.create_major_overlap()
         
         '''
         
@@ -73,6 +107,14 @@ class MajorContracts():
         first_day= '2016-1-1'
         last_day = '2016-12-31'
         last_transition = '1900-1-1'
+        
+        # dictionary for each expiration date
+        word_counts_dict = {}
+        for l in np.arange(1, self._n):
+            word_counts_dict[l] = {self.ternary(k, l): 0 for k in np.arange(self._m ** l)}
+
+        probability_table = {}
+        
         for exp, trade_range in self._maturity.items():
             
             # laod data
@@ -98,13 +140,34 @@ class MajorContracts():
             print (exp, trade_range, start_time, end_time)
             
             tick_all = tick_all[(tick_all.index >= start_time) & (tick_all.index < end_time)]
+
+            ###############################################################
+            ### add probability table
             
+            tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
+            
+            #print(tick_all_sequence)
+            for l in np.arange(1, self._n):
+                for k in np.arange(self._m ** l):
+                     word_counts_dict[l][self.ternary(k, l)] += df_reader.count_word(tick_all_sequence, self.ternary(k, l))
+     
+            word_prob_all = pd.DataFrame()
+            for l in np.arange(1, self._n):
+                tmp = self.word_prob(word_counts_dict[l], l)
+                word_prob_all = word_prob_all.append(tmp)
+    
+            word_prob_all = word_prob_all[['prior', '0', '1', '2', 'total', 'max', 'max_pct']]
+            word_prob_all['offset'] = self._offset
+
+            probability_table[exp] = word_prob_all
+            
+            ###############################################################
+                        
             majorcontracts = majorcontracts.append(tick_all)
 
             last_transition = end_time
             
-        return majorcontracts.sort_index()
+        return majorcontracts.sort_index(), probability_table
     
-    # todo: calculate probability table.
     
     
