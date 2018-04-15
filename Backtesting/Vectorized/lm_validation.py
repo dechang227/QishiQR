@@ -82,6 +82,7 @@ class LmValidation:
             for avg_return, label in zip(self._average_return, np.arange(2, 2+len(self._average_return))):
                 avg_return.plot(label=label)
             plt.legend(loc='upper left')
+            plt.title('Equity Curve')
             fig.savefig(self._valid_dir + '/performance_' + self._symbol + '.png')
             plt.close()
 
