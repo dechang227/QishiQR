@@ -93,6 +93,21 @@ class OneContractTest:
     def plot(self, target_col="equitycurve", ax=None):
         return self.ensemble.plot(target_col, ax)
 
+class NoisyOneContractTest(OneContractTest):
+    def __init__(self, DATA_DIR, OUTPUT_DIR, prob_table, noise=0.1):
+        OneContractTest.__init__(self, DATA_DIR, OUTPUT_DIR, prob_table)
+        self.noise = noise
+
+    def compile_data(self, commodity, exp_date, offset=0, freq='5min', start='20160701', end='20161031'):
+        instrument = commodity + exp_date
+        tick_day = df_reader(instrument + '*', topdir=self._DATA_DIR + commodity + '/day', offset=offset, freq=freq,day=True, symbol=commodity).get_tick(raw=False)
+        tick_night = df_reader(instrument + '*', topdir=self._DATA_DIR + commodity + '/night', offset=offset, freq=freq, day=False, symbol=commodity).get_tick(raw=False)
+        
+        tick_all = pd.concat([tick_day, tick_night])
+        tick_all.sort_index(inplace=True)
+        tick_all['LastPrice'] = tick_all['LastPrice'].map(lambda x: x*(1+np.random.uniform(-self.noise, self.noise)))
+        return tick_all[(tick_all.index >= start) & (tick_all.index < end)]
+
 
 class MultiContractTest:
     """
@@ -138,3 +153,46 @@ class MultiContractTest:
     def plot(self, target_col="equitycurve", ax=None):
         return self.ensemble.plot(target_col, ax)
 
+
+class MultiFrequencyTest:
+    """
+    Test Multiple contract with one orders
+    """
+    def __init__(self, DATA_DIR, OUTPUT_DIR, prob_table):
+        """
+        Read in Data and the probability table
+        """
+        self._DATA_DIR = DATA_DIR
+        self._OUTPUT_DIR = OUTPUT_DIR
+        self.prob_table = prob_table
+        self.test_data = None
+        self.signals = None
+    def compile_data(self, commodity, exp_list='1705', offset=0, freq=['{}min'.format(i) for i in range(1, 5)], start='20160701', end='20161031'):
+        instrument = commodity + exp_list
+        def get_instrument(instrument, freq):
+            tick_day = df_reader(instrument + '*', topdir=self._DATA_DIR + commodity + '/day', offset=offset, freq=freq,day=True, symbol=commodity).get_tick(raw=False)
+            tick_night = df_reader(instrument + '*', topdir=self._DATA_DIR + commodity + '/night', offset=offset, freq=freq, day=False, symbol=commodity).get_tick(raw=False)
+            tick_all = pd.concat([tick_day, tick_night])
+            tick_all.sort_index(inplace=True)
+            return tick_all[(tick_all.index >= start) & (tick_all.index < end)]
+        return [get_instrument(instrument, f) for f in freq]
+
+    def compile_signal(self, data, slm, model_order=4):
+        """
+        Generate signals for different orders
+        """
+        signals = [SLMStrategy(instrument, slm, model_order).generatingsignal() for instrument in data]
+        return signals
+
+    def build(self, commodity, exp_date, model_order=4, freq=['{}min' for i in range(1, 5)], offset=0, start='20160701', end='20161031', tca=None):
+        self.test_data = self.compile_data(commodity, exp_date, freq=freq,   start = start, end=end)
+        self.signals = self.compile_signal(self.test_data, self.prob_table, model_order)
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, labels=exp_date)
+        self.ensemble.build()
+
+    def run(self):
+        self.results = self.ensemble.run()
+        self.performance = self.ensemble.calperformance()
+
+    def plot(self, target_col="equitycurve", ax=None):
+        return self.ensemble.plot(target_col, ax)
