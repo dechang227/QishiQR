@@ -15,9 +15,9 @@ class vectorizedbacktest:
         self.result = self.data
         self.result['tradeID'] = (~(self.result['signal']==self.result['signal'].shift(1))).cumsum()
         self.result['return'] = np.log(self.result['LastPrice']/self.result['LastPrice'].shift(1))
-        self.result['return'][0] = 0.0
+        self.result['return'].loc[0] = 0.0
         self.result['signal_bar'] = self.result['signal'].apply(lambda x: 1 if x == 2 else (-1 if x == 1 else 0))
-        self.result['signal_bar'][0] = 0
+        #self.result['signal_bar'][0] = 0
         self.result['strategy'] = self.result['return'] * self.result['signal_bar']
  
         # This step is to take into account of transaction cost. For every order, return reduced by half of the spread

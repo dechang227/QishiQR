@@ -9,7 +9,7 @@ from Backtesting.Vectorized.cross_compare import ensembler
 
 
 class LmValidation:
-    def __init__(self, slm, symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', max_order=8):
+    def __init__(self, slm, symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', max_order=8, offsets_average = False, n_offsets = 5):
         '''
         :param slm: language model dataframe having at least two columns: prior and signal
         :param symbol:
@@ -21,6 +21,9 @@ class LmValidation:
         self._data_dir = data_dir
         self._valid_dir = valid_dir
         self._max_order = max_order
+        self._offsets_average = offsets_average
+        self._average_return = None
+        self._n_offsets = n_offsets
 
     def gen_find(self):
         '''
@@ -43,20 +46,6 @@ class LmValidation:
                 validator_ensemble.build()
                 validator_ensemble.run()
 
-                fig = plt.figure()
-                #benchmark = validator_ensemble.results[0]['return'].cumsum() + 1
-                benchmark = validator_ensemble.results[0]['LastPrice']
-                #print(len(benchmark.index))
-                initial_value = benchmark[0]
-                benchmark = benchmark/initial_value
-                #print(len(benchmark.index))
-                #plt.plot(benchmark['index'], benchmark['return'])
-                #print(validator_ensemble.results[0].columns.values)
-                benchmark.plot()
-                plt.title('Benchmark')
-                fig.savefig(self._valid_dir + '/benchmark_' + re.sub('.csv', '.png', filename))
-                plt.close()
-
                 performance = validator_ensemble.calperformance()
                 performance.to_csv(self._valid_dir + '/performance_' + filename)
                 validator_ensemble.plot()
@@ -65,4 +54,42 @@ class LmValidation:
                 # validator_ensemble.plot(target_col="benchmark")
                 # plt.savefig(self._valid_dir + '/benchmark_' + re.sub('.csv', '.png', filename))
                 # plt.close()
+                fig = plt.figure()
+                #benchmark = validator_ensemble.results[0]['return'].cumsum() + 1
+                benchmark = validator_ensemble.results[0]['benchmark']
+                #print(len(benchmark.index))
+                #initial_value = benchmark[0]
+                #benchmark = benchmark/initial_value
+                benchmark.plot()
+                plt.title('Benchmark')
+                fig.savefig(self._valid_dir + '/benchmark_' + re.sub('.csv', '.png', filename))
+                plt.close()
+
+                if self._offsets_average:
+                    if not self._average_return:
+                        self._average_return = [df['strategy'] for df in validator_ensemble.results]
+                        average_performace = performance
+                    else:
+                        self._average_return = [df1.add(df2['strategy'], fill_value=0) for (df1, df2) in zip(self._average_return, validator_ensemble.results)]
+                        average_performace = average_performace.add(performance, fill_value=0)
+        '''
+        average return of all offsets
+        '''
+        if self._offsets_average:
+            self._average_return = [(1+df.divide(self._n_offsets)).cumprod() for df in self._average_return]
+
+            fig = plt.figure()
+            for avg_return, label in zip(self._average_return, np.arange(2, 2+len(self._average_return))):
+                avg_return.plot(label=label)
+            plt.legend(loc='upper left')
+            plt.title('Equity Curve')
+            fig.savefig(self._valid_dir + '/performance_' + self._symbol + '.png')
+            plt.close()
+
+            average_performace = average_performace.divide(self._n_offsets)
+            average_performace.to_csv(self._valid_dir + '/performance_' + self._symbol + '.csv')
+
+
+
+
 
