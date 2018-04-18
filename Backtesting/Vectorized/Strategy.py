@@ -34,8 +34,8 @@ class MovingAverageStrategy(object):
         self.data['signal'] = 0  # initiate all signal position to 0
         # self.data['closeMid'] = (self.data['closeBid'] + self.data['closeAsk']) / 2
         # use the open price to predict the price change and place order before the market closing
-        self.data['fastma'] = self.data['Adj. Open'].rolling(window=self.short_window).mean()
-        self.data['slowma'] = self.data['Adj. Open'].rolling(window=self.long_window).mean()
+        self.data['fastma'] = self.data['LastPrice'].shift(1).rolling(window=self.short_window).mean()
+        self.data['slowma'] = self.data['LastPrice'].shift(1).rolling(window=self.long_window).mean()
         self.data = self.data.dropna()
         self.data['signal'] = np.where(self.data['fastma'] > self.data['slowma'], 1, -1)
         return self.data
