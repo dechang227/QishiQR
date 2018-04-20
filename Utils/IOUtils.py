@@ -126,10 +126,15 @@ class df_reader:
                 'ru': ' 23:00:00.0',        # Ru: 23:00pm
                 'zn': ' 1:00:00.0'         # Zn: 01:00am
             }
+            if self._symbol in ['rb', 'ru']:
+                day2 = dates[0]
+            else:
+                day2 = dates[-1]
 
+            print ('day2 :', day2)
             try:
                 start = pd.to_datetime(dates[0] + night_start) + timedelta(minutes=self._offset)
-                index=pd.date_range(start, dates[-1] + night_end[self._symbol], freq=self._freq)
+                index=pd.date_range(start, day2 + night_end[self._symbol], freq=self._freq)
             except KeyError:
                 print ('Symbol {} not recoginized !!!'.format(self._symbol))
                 sys.exit()
