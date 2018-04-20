@@ -131,7 +131,6 @@ class df_reader:
             else:
                 day2 = dates[-1]
 
-            print ('day2 :', day2)
             try:
                 start = pd.to_datetime(dates[0] + night_start) + timedelta(minutes=self._offset)
                 index=pd.date_range(start, day2 + night_end[self._symbol], freq=self._freq)
