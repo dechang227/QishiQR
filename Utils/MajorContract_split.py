@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import sys
 
-from IOUtils import df_reader
+from Utils.IOUtils import df_reader
 
 class MajorContracts():
     ''' Generate the time series of major contracts for given commodity.
@@ -90,7 +90,7 @@ class MajorContracts():
         probability_table = {}
         
         for exp, trade_range in self._maturity.items():
-            
+
             # laod data
             instrument = self._symbol + exp
             print (instrument, self._topdir + '/'+self._symbol)
@@ -105,7 +105,7 @@ class MajorContracts():
             tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > 0 else (1 if x < 0 else 0))
 
             # slice major contracts trading period
-            assert self._transitions[exp] < trade_range[1] and self._transitions[exp] > trade_range[0]
+            assert pd.to_datetime(self._transitions[exp]) < pd.to_datetime(trade_range[1]) and pd.to_datetime(self._transitions[exp]) > pd.to_datetime(trade_range[0])
             
             start_time = max(pd.to_datetime(first_day), pd.to_datetime(last_transition), pd.to_datetime(trade_range[0]))
             end_time   = min(pd.to_datetime(self._transitions[exp]), pd.to_datetime(last_day))
@@ -132,16 +132,16 @@ class MajorContracts():
             tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
             
             # initialize
-            for l in np.arange(1, self._n):
+            for l in np.arange(1, self._n+1):
                 word_counts_dict[l] = {self.ternary(k, l): 0 for k in np.arange(self._m ** l)}
             
             #print(tick_all_sequence)
-            for l in np.arange(1, self._n):
+            for l in np.arange(1, self._n+1):
                 for k in np.arange(self._m ** l):
                      word_counts_dict[l][self.ternary(k, l)] += df_reader.count_word(tick_all_sequence, self.ternary(k, l))
      
             word_prob_all = pd.DataFrame()
-            for l in np.arange(1, self._n):
+            for l in np.arange(1, self._n+1):
                 tmp = self.word_prob(word_counts_dict[l], l)
                 word_prob_all = word_prob_all.append(tmp)
     
