@@ -187,7 +187,7 @@ class MultiFrequencyTest:
     def build(self, commodity, exp_date, model_order=4, freq=['{}min' for i in range(1, 5)], offset=0, start='20160701', end='20161031', tca=None):
         self.test_data = self.compile_data(commodity, exp_date, freq=freq,   start = start, end=end)
         self.signals = self.compile_signal(self.test_data, self.prob_table, model_order)
-        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, labels=exp_date)
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, labels=freq)
         self.ensemble.build()
 
     def run(self):
