@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Apr  7 20:04:48 2018
-
-@author: Gang Shen
-"""
 
 import pandas as pd
 import numpy as np
+import sys
 
-from IOUtils import df_reader
+from Utils.IOUtils import df_reader
 
 class MajorContracts():
     ''' Generate the time series of major contracts for given commodity.
     '''
     
-    def __init__(self, symbol='rb', topdir=r'../data', maturity={'1605':['2015-11-1','2016-3-1'],
+    def __init__(self, symbol='rb', split_time = '2016-6-1', topdir=r'../data', maturity={'1605':['2015-11-1','2016-3-1'],
                                               '1609':['2016-3-1','2016-6-1'],
                                               '1701':['2016-7-1','2016-11-1'],
                                               '1705':['2016-11-1','2017-3-1']},
@@ -22,6 +18,7 @@ class MajorContracts():
         
         self._symbol  = symbol
         self._topdir  = topdir
+        self._split_time = pd.to_datetime(split_time)
         self._offset  = kwargs.get('offset', 0.1)
         self._freq    = kwargs.get('freq', 15)       
         
@@ -34,30 +31,7 @@ class MajorContracts():
         self._m = 3
         self._n = 8
         
-    def create_major(self):
-        ''' major contracts without overlap time.'''
-        
-        majorcontracts = pd.DataFrame()
-        for exp, trade_range in self._maturity.items():
-            
-            instrument = self._symbol + exp
-            print (instrument, self._topdir + '/'+self._symbol+ '/day')
-            
-            tick_day = df_reader(instrument + '*', topdir=self._topdir + '/'+self._symbol+ '/day', offset=self._offset, freq=str(self._freq)+'min',day=True, symbol=self._symbol).get_tick(raw=False)
-            tick_night = df_reader(instrument + '*', topdir=self._topdir + '/'+self._symbol+ '/night', offset=self._offset, freq=str(self._freq)+'min', day=False, symbol=self._symbol).get_tick(raw=False)
-
-            tick_all = pd.concat([tick_day, tick_night])
-            tick_all.sort_index(inplace=True)
-            
-            tick_all = tick_all[(tick_all.index >= trade_range[0]) & (tick_all.index < trade_range[1])]
-
-            tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > 0 else (1 if x < 0 else 0))
-            
-            majorcontracts = majorcontracts.append(tick_all)
-            
-        return majorcontracts.sort_index()
-
-    
+     
     def ternary (self, k, l):
         if k == 0:
             return '0'*l
@@ -90,17 +64,19 @@ class MajorContracts():
         example: 
             
         rb_mj = MajorContracts(
-                               topdir='C:/Qishi_QR/data', 
+                               topdir='C:/Qishi_QR/data', split_time = '2016-5-1',
                                maturity={'1609':['2015-11-1','2016-8-1'], '1705':['2016-6-1','2017-3-1']}, 
                                transitions={'1609':'2016-7-1', '1705':'2017-2-1'}
                                ) 
         
-        df, ptb = rb_mj2.create_major_overlap()
+        train, test, ptb = rb_mj2.create_major_overlap()
         
         '''
         
         # if there is no transition provided, return vanilla version.
-        if self._transitions == None: return self.create_major()
+        if self._transitions == None: 
+            print ('Need transition time!')
+            sys.exit()
         
         majorcontracts = pd.DataFrame()
         
@@ -110,16 +86,14 @@ class MajorContracts():
         
         # dictionary for each expiration date
         word_counts_dict = {}
-        for l in np.arange(1, self._n):
-            word_counts_dict[l] = {self.ternary(k, l): 0 for k in np.arange(self._m ** l)}
 
         probability_table = {}
         
         for exp, trade_range in self._maturity.items():
-            
+
             # laod data
             instrument = self._symbol + exp
-            print (instrument, self._topdir + '/'+self._symbol+ '/day')
+            print (instrument, self._topdir + '/'+self._symbol)
             
             tick_day = df_reader(instrument + '*', topdir=self._topdir + '/'+self._symbol+ '/day', offset=self._offset, freq=str(self._freq)+'min',day=True, symbol=self._symbol).get_tick(raw=False)
             tick_night = df_reader(instrument + '*', topdir=self._topdir + '/'+self._symbol+ '/night', offset=self._offset, freq=str(self._freq)+'min', day=False, symbol=self._symbol).get_tick(raw=False)
@@ -131,28 +105,43 @@ class MajorContracts():
             tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > 0 else (1 if x < 0 else 0))
 
             # slice major contracts trading period
-            assert self._transitions[exp] < trade_range[1] and self._transitions[exp] > trade_range[0]
+            assert pd.to_datetime(self._transitions[exp]) < pd.to_datetime(trade_range[1]) and pd.to_datetime(self._transitions[exp]) > pd.to_datetime(trade_range[0])
             
             start_time = max(pd.to_datetime(first_day), pd.to_datetime(last_transition), pd.to_datetime(trade_range[0]))
             end_time   = min(pd.to_datetime(self._transitions[exp]), pd.to_datetime(last_day))
             
             print ('ID', 'trade_range', 'transition_begin', 'transition_end')
             print (exp, trade_range, start_time, end_time)
-            
+                        
             tick_all = tick_all[(tick_all.index >= start_time) & (tick_all.index < end_time)]
+                        
+            majorcontracts = majorcontracts.append(tick_all)
 
-            ###############################################################
-            ### add probability table
+            last_transition = end_time
             
+            ###############################################################
+            ### add probability table for training data before split_time
+            
+            if start_time >= self._split_time: 
+                continue
+            
+            tick_all = tick_all[(tick_all.index <= self._split_time)]
+            
+            print ('probability table: ', tick_all.Date.min(), tick_all.Date.max())
+                
             tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
             
+            # initialize
+            for l in np.arange(1, self._n+1):
+                word_counts_dict[l] = {self.ternary(k, l): 0 for k in np.arange(self._m ** l)}
+            
             #print(tick_all_sequence)
-            for l in np.arange(1, self._n):
+            for l in np.arange(1, self._n+1):
                 for k in np.arange(self._m ** l):
                      word_counts_dict[l][self.ternary(k, l)] += df_reader.count_word(tick_all_sequence, self.ternary(k, l))
      
             word_prob_all = pd.DataFrame()
-            for l in np.arange(1, self._n):
+            for l in np.arange(1, self._n+1):
                 tmp = self.word_prob(word_counts_dict[l], l)
                 word_prob_all = word_prob_all.append(tmp)
     
@@ -162,12 +151,12 @@ class MajorContracts():
             probability_table[exp] = word_prob_all
             
             ###############################################################
-                        
-            majorcontracts = majorcontracts.append(tick_all)
 
-            last_transition = end_time
+        train = majorcontracts[majorcontracts.index <= self._split_time]
+        test  = majorcontracts[majorcontracts.index > self._split_time]
             
-        return majorcontracts.sort_index(), probability_table
+        # note one could merge the probability table for all expiration time.
+        return train, test, probability_table
     
     
     

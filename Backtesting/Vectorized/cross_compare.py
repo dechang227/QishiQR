@@ -24,7 +24,7 @@ class ensembler:
             assert len(labels) == len(self.signals), 'Labels does not match signal'
             self.labels = labels
         except:
-            self.labels = list(range(1, len(signals)+1))
+            self.labels = list(range(2, len(signals)+2))
 
         self.ensembles = None
         self.results = None

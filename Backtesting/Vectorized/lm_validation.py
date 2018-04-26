@@ -7,7 +7,6 @@ from Backtesting.Vectorized.Strategy import SLMStrategy
 from Backtesting.Vectorized.backtest import vectorizedbacktest
 from Backtesting.Vectorized.cross_compare import ensembler
 
-
 class LmValidation:
     def __init__(self, slm, symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', max_order=8, offsets_average = False, n_offsets = 5):
         '''
@@ -68,26 +67,38 @@ class LmValidation:
                 if self._offsets_average:
                     if not self._average_return:
                         self._average_return = [df['strategy'] for df in validator_ensemble.results]
-                        average_performace = performance
+                        average_performance = performance
+                        average_benchmark = validator_ensemble.results[0]['LastPrice']
                     else:
                         self._average_return = [df1.add(df2['strategy'], fill_value=0) for (df1, df2) in zip(self._average_return, validator_ensemble.results)]
-                        average_performace = average_performace.add(performance, fill_value=0)
+                        average_performance = average_performance.add(performance, fill_value=0)
+                        average_benchmark = average_benchmark.add(validator_ensemble.results[0]['LastPrice'], fill_value=0)
         '''
         average return of all offsets
         '''
-        if self._offsets_average:
+        if self._offsets_average and (self._average_return is not None):
             self._average_return = [(1+df.divide(self._n_offsets)).cumprod() for df in self._average_return]
-
+            average_benchmark = average_benchmark/average_benchmark[0]
+            average_benchmark = average_benchmark.to_frame()
+            average_benchmark['Date'] = pd.to_datetime(average_benchmark.index)
+            #print(average_benchmark)
             fig = plt.figure()
+            plt.plot(average_benchmark.Date, average_benchmark.LastPrice,label='benchmark')
             for avg_return, label in zip(self._average_return, np.arange(2, 2+len(self._average_return))):
-                avg_return.plot(label=label)
+                #avg_return.plot(label=label)
+                df = avg_return.to_frame()
+                df['Date'] = pd.to_datetime(df.index)
+                plt.plot(df.Date, df.strategy, label=label)
+            fig.autofmt_xdate()
             plt.legend(loc='upper left')
             plt.title('Equity Curve')
+            plt.show()
             fig.savefig(self._valid_dir + '/performance_' + self._symbol + '.png')
             plt.close()
 
-            average_performace = average_performace.divide(self._n_offsets)
-            average_performace.to_csv(self._valid_dir + '/performance_' + self._symbol + '.csv')
+            average_performance = average_performance.divide(self._n_offsets)
+            print(average_performance)
+            average_performance.to_csv(self._valid_dir + '/performance_' + self._symbol + '.csv')
 
 
 
