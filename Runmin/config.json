@@ -1,9 +1,10 @@
 {
-    "Root path": "C:\\Linux_home\\Qishi\\QishiQR",
-    "Tick path": "C:\\Linux_home\\Qishi\\tick2016",
-    "Strategy path": "C:\\Linux_home\\Qishi\\Strategy",
-    "Validate path": "C:\\Linux_home\\Qishi\\Validate",
-    "Output path": "C:\\Linux_home\\Qishi\\Output",
+    "Root path": "C:/Linux_home/Qishi/QishiQR",
+    "Tick path": "C:/Linux_home/Qishi/tick2016/",
+    "Strategy path": "C:/Linux_home/Qishi/Strategy",
+    "Major path": "C:/Linux_home/Qishi/Major_Series",
+    "Validate path": "C:/Linux_home/Qishi/Validate",
+    "Output path": "C:/Linux_home/Qishi/Output",
     
     "State number": 3,
     "Max model order": 7,
