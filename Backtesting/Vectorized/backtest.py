@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from Utils.IOUtils import *
-from Strategy import *
+from .Strategy import *
 
 
 class vectorizedbacktest:

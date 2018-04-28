@@ -26,7 +26,7 @@ class ensembler:
         try:
             assert len(labels) == len(self.signals), 'Labels does not match signal'
             self.labels = labels
-        except:
+        except TypeError:
             self.labels = list(range(2, len(signals)+2))
 
         self.ensembles = None
@@ -65,8 +65,8 @@ class ensembler:
         [tester.calperformance() for tester in self.ensembles]
         try:
             self.performance = pd.DataFrame([tester.performance for tester in self.ensembles])
-            if not self.labels:
-                self.performance.index = labels
+            # if not self.labels:
+            #     self.performance.index = labels
         except:
             print('Failed to build the performance DataFrame')
         return self.performance
@@ -92,7 +92,6 @@ class ensembler:
 
         ax.legend()
         ax.set_title(target_col)
-
         return ax
 
 
