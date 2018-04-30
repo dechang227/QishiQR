@@ -22,7 +22,6 @@ class MajorContracts():
         self._offset  = kwargs.get('offset', 0.1)
         self._freq    = kwargs.get('freq', 15)       
         self._price_threshold = kwargs.get('px_th', 0)      # threshold of price movements. Example: 0.01 means that an effective price movement needs 1% difference in price
-        
         # transition time between major contracts. eg, 'transitions' = {'1605': '2016-2-1', ...}
         self._transitions  = kwargs.get('transitions', None)  
     
@@ -103,8 +102,8 @@ class MajorContracts():
             tick_all.sort_index(inplace=True)
             
             # create trade direction
-            tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < self._price_threshold else 0))
-
+            tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
+            print(self._price_threshold)
             # slice major contracts trading period
             assert pd.to_datetime(self._transitions[exp]) < pd.to_datetime(trade_range[1]) and pd.to_datetime(self._transitions[exp]) > pd.to_datetime(trade_range[0])
             
