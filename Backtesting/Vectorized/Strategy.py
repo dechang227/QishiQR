@@ -58,7 +58,7 @@ class SLMStrategy(Strategy):
 
     def generatingsignal(self):
         self.data = super(SLMStrategy, self).generatingsignal()
-        self.data['Direction'] = self.data[self.price].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < self._price_threshold else 0))
+        self.data['Direction'] = self.data[self.price].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
         sequence = self.data['Direction'].astype(str).str.cat()
         prior_ls = ['p'] * self.m + ['p' + sequence[i:i + self.m] for i in np.arange(len(sequence) - self.m)]
         # print(len(prior_ls))

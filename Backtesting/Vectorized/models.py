@@ -107,7 +107,7 @@ class MajorSeriesTest:
     """
     Test ONE major series with different orders
     """
-    def __init__(self, major_series, OUTPUT_DIR, prob_table):
+    def __init__(self, major_series, OUTPUT_DIR, prob_table, px_th=0.0):
         """
         Read in Data and the probability table
 
@@ -120,13 +120,14 @@ class MajorSeriesTest:
         self.test_data = major_series
         self.signals = None
         self.prob_table = prob_table
+        self._price_threshold = px_th
 
     def compile_signal(self, data, slm, model_orders):
         """
         Generate signals for different orders
         """
 
-        signals = [SLMStrategy(data, slm, m).generatingsignal() for m in range(1,model_orders+1)]
+        signals = [SLMStrategy(data, slm, m, px_th=self._price_threshold).generatingsignal() for m in range(1,model_orders+1)]
 
         return signals
 
