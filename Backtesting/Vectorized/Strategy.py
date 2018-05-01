@@ -48,16 +48,17 @@ class SLMStrategy(Strategy):
         SLM: word frequency data frame
         m: model degree
     """
-    def __init__(self, data, slm, m, price='LastPrice'):
+    def __init__(self, data, slm, m, price='LastPrice', **kwargs):
         Strategy.__init__(self, data)
         self.slm = slm
         self.m = m
         self.price = price
+        self._price_threshold = kwargs.get('px_th', 0)
         # self.n = len(slm['signal'].unique())
 
     def generatingsignal(self):
         self.data = super(SLMStrategy, self).generatingsignal()
-        self.data['Direction'] = self.data[self.price].pct_change().apply(lambda x: 2 if x > 0 else (1 if x < 0 else 0))
+        self.data['Direction'] = self.data[self.price].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < self._price_threshold else 0))
         sequence = self.data['Direction'].astype(str).str.cat()
         prior_ls = ['p'] * self.m + ['p' + sequence[i:i + self.m] for i in np.arange(len(sequence) - self.m)]
         # print(len(prior_ls))
