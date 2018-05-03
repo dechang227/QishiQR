@@ -83,6 +83,9 @@ class MajorContracts():
         ''' major contracts with overlap time.
         return dataframe for the concated timeseries and probability table for each major contracts in given time period.
         
+        Args:
+            session_split: lists of split time. example - ['11:40:00', '17:00:00', '03:00:00']
+
         example: 
             
         rb_mj = MajorContracts(
@@ -149,12 +152,13 @@ class MajorContracts():
             
             tick_all = tick_all[(tick_all.index <= self._split_time)]
             
-            self.session_break(tick_all, start_time.date(), end_time.date(), '11:40:00')
+            ###############################################################
+            ### add break points between sessions
+            if session_split is not None:
+                self.session_break(tick_all, start_time.date(), end_time.date(), session_split)
             print ('probability table: ', tick_all.Date.min(), tick_all.Date.max())
-            print(tick_all)
                 
             tick_all_sequence = tick_all['Direction'].astype(int).astype(str).str.cat()
-            print(tick_all_sequence)
             # initialize
             for l in np.arange(1, self._n+1):
                 word_counts_dict[l] = {self.ternary(k, l): 0 for k in np.arange(self._m ** l)}
