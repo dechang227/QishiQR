@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 from Utils.IOUtils import df_reader
-
+from functools import reduce
 class MajorContracts():
     ''' Generate the time series of major contracts for given commodity.
     '''
@@ -56,8 +56,30 @@ class MajorContracts():
         word_counts_t['prior'] = 'p'+word_counts_t.index.map(str)
         return word_counts_t
 
+    def session_break(self, tick_all, start_day, end_day, break_time, split_col='Direction'):
+        """
+        Insert breaking timepoints in the tick tick_all
+        
+        Args:
+            start_day: str. yyyy-mm-dd
+            break_time: str. hh:mm:ss
+        """
+        if type(break_time) is str:
+            break_time = [break_time]
+        break_indicator = []
+
+        for bt in break_time:
+            start = pd.to_datetime(start_day) + pd.to_timedelta(bt)
+            end   = pd.to_datetime(end_day) + pd.to_timedelta(bt)
+            break_indicator.append(pd.date_range(start, end, freq='1d'))
+        time_index = reduce(lambda x,y: x.append(y), break_indicator)
+
+        for idx in time_index:
+            tick_all.loc[idx,split_col] = 9
+
+        tick_all.sort_index(inplace=True)
     
-    def create_major_overlap(self):
+    def create_major_overlap(self, session_split=None):
         ''' major contracts with overlap time.
         return dataframe for the concated timeseries and probability table for each major contracts in given time period.
         
@@ -114,7 +136,7 @@ class MajorContracts():
             print (exp, trade_range, start_time, end_time)
                         
             tick_all = tick_all[(tick_all.index >= start_time) & (tick_all.index < end_time)]
-                        
+
             majorcontracts = majorcontracts.append(tick_all)
 
             last_transition = end_time
@@ -127,10 +149,12 @@ class MajorContracts():
             
             tick_all = tick_all[(tick_all.index <= self._split_time)]
             
+            self.session_break(tick_all, start_time.date(), end_time.date(), '11:40:00')
             print ('probability table: ', tick_all.Date.min(), tick_all.Date.max())
+            print(tick_all)
                 
-            tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
-            
+            tick_all_sequence = tick_all['Direction'].astype(int).astype(str).str.cat()
+            print(tick_all_sequence)
             # initialize
             for l in np.arange(1, self._n+1):
                 word_counts_dict[l] = {self.ternary(k, l): 0 for k in np.arange(self._m ** l)}
