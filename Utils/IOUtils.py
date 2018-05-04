@@ -1,3 +1,4 @@
+from multiprocessing import Pool, cpu_count
 import pandas as pd
 import sys
 import os
@@ -150,19 +151,22 @@ class df_reader:
         Open a sequence of filenames one at a time producing a file object.
         The file is closed immediately when proceeding to the next iteration.
         '''
-        df = pd.DataFrame()
-        for filename in filenames:
+        Parallel = True  # Remeber to switch it off if you are not using solid-state disk drives.
 
-            tmp = self.f_fill(filename)
-            
-            df = df.append(tmp)     
-        
-            #print (tmp.head())
-            
+        if not Parallel:
+            df = pd.DataFrame()
+            for filename in filenames:
+
+                tmp = self.f_fill(filename)
+                
+                df = df.append(tmp)     
+
+        else:
+            with Pool(cpu_count()) as pool:
+                df = pool.map(self.f_fill, filenames)
+            df = pd.concat(df)
+
         return df.sort_index()
-    
-        
-
 
     ########################################################################
     #                       Utilities                                      # 
