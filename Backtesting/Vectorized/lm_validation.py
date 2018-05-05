@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import importlib
+import Backtesting.Vectorized.cross_compare
+importlib.reload(Backtesting.Vectorized.cross_compare)
+
 from Utils.IOUtils import *
 import os
 from Backtesting.Vectorized.Strategy import SLMStrategy
@@ -8,7 +12,7 @@ from Backtesting.Vectorized.backtest import vectorizedbacktest
 from Backtesting.Vectorized.cross_compare import ensembler
 
 class LmValidation:
-    def __init__(self, slm, symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', max_order=8, offsets_average = False, n_offsets = 5):
+    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', max_order=8, offsets_average = False, n_offsets = 5):
         '''
         :param slm: language model dataframe having at least two columns: prior and signal
         :param symbol:
@@ -23,6 +27,8 @@ class LmValidation:
         self._offsets_average = offsets_average
         self._average_return = None
         self._n_offsets = n_offsets
+        self._start = start
+        self._end = end
 
     def gen_find(self):
         '''
@@ -32,16 +38,16 @@ class LmValidation:
             for name in fnmatch.filter(filelist, self._symbol + '*'):
                 yield name
 
-    def run(self):
+    def run(self, tcas=None):
         filenames = self.gen_find()
         for filename in filenames:
             data = pd.read_csv(self._data_dir + '/' + filename, index_col=0)
-            data = data[(pd.to_datetime(data.index) >= '2016-7-1 09:00:00.0') & (pd.to_datetime(data.index) < '2016-10-1 09:00:00.0')]
+            data = data[(pd.to_datetime(data.index) >= pd.to_datetime(self._start)) & (pd.to_datetime(data.index) < pd.to_datetime(self._end))]
             if len(data) == 0:
                 continue
             else:
                 signals = [SLMStrategy(data, self._slm, m).generatingsignal() for m in np.arange(1, self._max_order + 1)]
-                validator_ensemble = ensembler(vectorizedbacktest, signals)
+                validator_ensemble = ensembler(vectorizedbacktest, signals, tcas=tcas)
                 validator_ensemble.build()
                 validator_ensemble.run()
 

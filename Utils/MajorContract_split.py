@@ -5,7 +5,7 @@ import numpy as np
 import sys
 
 from Utils.IOUtils import df_reader
-
+from functools import reduce
 class MajorContracts():
     ''' Generate the time series of major contracts for given commodity.
     '''
@@ -21,7 +21,7 @@ class MajorContracts():
         self._split_time = pd.to_datetime(split_time)
         self._offset  = kwargs.get('offset', 0.1)
         self._freq    = kwargs.get('freq', 15)       
-        
+        self._price_threshold = kwargs.get('px_th', 0)      # threshold of price movements. Example: 0.01 means that an effective price movement needs 1% difference in price
         # transition time between major contracts. eg, 'transitions' = {'1605': '2016-2-1', ...}
         self._transitions  = kwargs.get('transitions', None)  
     
@@ -56,11 +56,36 @@ class MajorContracts():
         word_counts_t['prior'] = 'p'+word_counts_t.index.map(str)
         return word_counts_t
 
+    def session_break(self, tick_all, start_day, end_day, break_time, split_col='Direction'):
+        """
+        Insert breaking timepoints in the tick tick_all
+        
+        Args:
+            start_day: str. yyyy-mm-dd
+            break_time: str. hh:mm:ss
+        """
+        if type(break_time) is str:
+            break_time = [break_time]
+        break_indicator = []
+
+        for bt in break_time:
+            start = pd.to_datetime(start_day) + pd.to_timedelta(bt)
+            end   = pd.to_datetime(end_day) + pd.to_timedelta(bt)
+            break_indicator.append(pd.date_range(start, end, freq='1d'))
+        time_index = reduce(lambda x,y: x.append(y), break_indicator)
+
+        for idx in time_index:
+            tick_all.loc[idx,split_col] = 9
+
+        tick_all.sort_index(inplace=True)
     
-    def create_major_overlap(self):
+    def create_major_overlap(self, session_split=None):
         ''' major contracts with overlap time.
         return dataframe for the concated timeseries and probability table for each major contracts in given time period.
         
+        Args:
+            session_split: lists of split time. example - ['11:40:00', '17:00:00', '03:00:00']
+
         example: 
             
         rb_mj = MajorContracts(
@@ -102,8 +127,8 @@ class MajorContracts():
             tick_all.sort_index(inplace=True)
             
             # create trade direction
-            tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > 0 else (1 if x < 0 else 0))
-
+            tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
+            print(self._price_threshold)
             # slice major contracts trading period
             assert pd.to_datetime(self._transitions[exp]) < pd.to_datetime(trade_range[1]) and pd.to_datetime(self._transitions[exp]) > pd.to_datetime(trade_range[0])
             
@@ -114,7 +139,7 @@ class MajorContracts():
             print (exp, trade_range, start_time, end_time)
                         
             tick_all = tick_all[(tick_all.index >= start_time) & (tick_all.index < end_time)]
-                        
+
             majorcontracts = majorcontracts.append(tick_all)
 
             last_transition = end_time
@@ -127,10 +152,13 @@ class MajorContracts():
             
             tick_all = tick_all[(tick_all.index <= self._split_time)]
             
+            ###############################################################
+            ### add break points between sessions
+            if session_split is not None:
+                self.session_break(tick_all, start_time.date(), end_time.date(), session_split)
             print ('probability table: ', tick_all.Date.min(), tick_all.Date.max())
                 
-            tick_all_sequence = tick_all['Direction'].astype(str).str.cat()
-            
+            tick_all_sequence = tick_all['Direction'].astype(int).astype(str).str.cat()
             # initialize
             for l in np.arange(1, self._n+1):
                 word_counts_dict[l] = {self.ternary(k, l): 0 for k in np.arange(self._m ** l)}

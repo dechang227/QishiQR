@@ -17,15 +17,19 @@ class vectorizedbacktest:
         self.result['return'] = np.log(self.result['LastPrice']/self.result['LastPrice'].shift(1))
         self.result['return'].iloc[0] = 0.0
         self.result['signal_bar'] = self.result['signal'].apply(lambda x: 1 if x == 2 else (-1 if x == 1 else 0))
-        #self.result['signal_bar'][0] = 0
+        self.result['signal_bar'][0] = 0
+        self.result['signal_chg_size'] = abs(self.result['signal_bar'] - self.result['signal_bar'].shift(1))
+        self.result['signal_chg'] = (~(self.result['signal']==self.result['signal'].shift(1)))
         self.result['strategy'] = self.result['return'] * self.result['signal_bar']
  
         # This step is to take into account of transaction cost. For every order, return reduced by half of the spread
         if(self.tca == 'Spread' or self.tca =='Compound'):
-            self.result['strategy'] = self.result['strategy']-0.5*np.log(self.result['AskPrice1']/self.result['BidPrice1'])*(self.result['signal_bar']!=0)
+            #
+            self.result['strategy'] = self.result['strategy']-0.5*np.log(self.result['AskPrice1']/self.result['BidPrice1'])*self.result['signal_chg_size']
         #  
         if(self.tca == 'Fixed' or self.tca == 'Compound'):
-            self.result['strategy'] = self.result['strategy']-0.00012*(self.result['signal_bar']!=0)
+            #0.00012 is trading cost, 0.0004 is for bid-ask spread to count
+            self.result['strategy'] = self.result['strategy']-0.00052*self.result['signal_chg']
         
         self.result.index = self.data.index
         return self.result

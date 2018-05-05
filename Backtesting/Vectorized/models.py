@@ -107,7 +107,7 @@ class MajorSeriesTest:
     """
     Test ONE major series with different orders
     """
-    def __init__(self, major_series, OUTPUT_DIR, prob_table):
+    def __init__(self, major_series, OUTPUT_DIR, prob_table, px_th=0.0):
         """
         Read in Data and the probability table
 
@@ -120,15 +120,15 @@ class MajorSeriesTest:
         self.test_data = major_series
         self.signals = None
         self.prob_table = prob_table
+        self._price_threshold = px_th
 
     def compile_signal(self, data, slm, model_orders):
         """
         Generate signals for different orders
         """
-        try:
-            signals = [SLMStrategy(data, slm, m).generatingsignal() for m in model_orders]
-        except TypeError:
-            signals = [SLMStrategy(data, slm, model_orders).generatingsignal()]
+
+        signals = [SLMStrategy(data, slm, m, px_th=self._price_threshold).generatingsignal() for m in range(1,model_orders+1)]
+
         return signals
 
     def build(self, model_order=7, freq='5min', start='20161001', end='20161221', offset=0, tca=None):
@@ -140,7 +140,7 @@ class MajorSeriesTest:
         """
         self.test_data = self.test_data[(self.test_data.index >= start) & (self.test_data.index < end)]
         self.signals = self.compile_signal(self.test_data, self.prob_table, model_orders=model_order)
-        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, labels = [model_order])
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca)
         self.ensemble.build()
 
     def run(self):
