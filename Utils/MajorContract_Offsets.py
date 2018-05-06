@@ -62,17 +62,20 @@ class MajorContracts():
     
     def create_major_overlap(self):
         ''' major contracts with overlap time.
-        return dataframe for the concated timeseries and probability table for each major contracts in given time period.
+        
+        return dict of dataframes for the concated timeseries and probability table for each major contracts 
+        in given time period; key is str rep. of offset in minute.
         
         example: 
-            
-        rb_mj = MajorContracts(
-                               topdir='C:/Qishi_QR/data', split_time = '2016-5-1',
-                               maturity={'1609':['2015-11-1','2016-8-1'], '1705':['2016-6-1','2017-3-1']}, 
-                               transitions={'1609':'2016-7-1', '1705':'2017-2-1'}
-                               ) 
+                    
+        import MajorContract_Offsets
+         
+        rb_mj = MajorContract_Offsets.MajorContracts(topdir='C:/Users/Shufang/Documents/Qishi_QR/data', split_time = '2016-5-1', 
+                                                     maturity={'1609':['2015-11-1','2016-8-1'], '1705':['2016-6-1','2017-3-1']},  
+                                                     transitions={'1609':'2016-7-1', '1705':'2017-2-1'},
+                                                     offset=[0.1, 0.2])
         
-        majorcontracts, ptb = rb_mj.create_major_overlap()
+        train, test, ptb = rb_mj.create_major_overlap()
         
         '''
         
@@ -160,8 +163,16 @@ class MajorContracts():
 
             probability_table[exp] = word_prob_all
             
+        train = defaultdict(lambda: pd.DataFrame())
+        test  = defaultdict(lambda: pd.DataFrame())
+        
+        for k in majorcontracts.keys():
+            
+            train[k] = majorcontracts[k][majorcontracts[k].index <= self._split_time]
+            test[k] = majorcontracts[k][majorcontracts[k].index > self._split_time]
+            
         # note one could merge the probability table for all expiration time.
-        return majorcontracts, probability_table
+        return train, test, probability_table
     
     
     
