@@ -70,7 +70,7 @@ class MajorContracts():
                     
         import MajorContract_Offsets
          
-        rb_mj = MajorContract_Offsets.MajorContracts(topdir='C:/Users/Shufang/Documents/Qishi_QR/data', split_time = '2016-5-1', 
+        rb_mj = MajorContract_Offsets.MajorContracts(topdir='C:/Documents/Qishi_QR/data', split_time = '2016-5-1', 
                                                      maturity={'1609':['2015-11-1','2016-8-1'], '1705':['2016-6-1','2017-3-1']},  
                                                      transitions={'1609':'2016-7-1', '1705':'2017-2-1'},
                                                      offset=[0.1, 0.2])
