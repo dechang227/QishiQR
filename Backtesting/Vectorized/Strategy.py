@@ -65,7 +65,7 @@ class SLMStrategy(Strategy):
         self.data['prior'] = prior_ls
         # self.data = pd.merge(self.data, self.slm[['prior', 'signal']], left_on=['prior'], right_on=['prior'],
         #                      how='left')
-        self.data = self.data.reset_index().merge(self.slm[['prior', 'signal']],left_on=['prior'], right_on=['prior'],
+        self.data = self.data.reset_index().merge(self.slm[['prior','max_pct', 'signal']],left_on=['prior'], right_on=['prior'],
                              how='left').set_index('index')
         self.data['signal'] = self.data['signal'].fillna(0).astype(int)
         #set last point before closing to be 0

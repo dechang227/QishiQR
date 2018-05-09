@@ -100,34 +100,3 @@ def compile_signal(data, slm, max_order=8):
     slm = slm.rename(columns={'max': 'signal'})
     signals = [SLMStrategy(data, slm, m).generatingsignal() for m in np.arange(1, max_order+1)]
     return signals
-
-
-class tester:
-    def __init__(self, DATA_DIR, OUTPUT_DIR, prob_table):
-        self._DATA_DIR = DATA_DIR
-        self._OUTPUT_DIR = OUTPUT_DIR
-        self.prob_table = prob_table
-
-    def build(self, commodity, exp_date, model_order=7, freq='5min', offset=0, start='20160701', end='20161031', tca=None):
-        self.config = {
-            'commodity': commodity,
-            'exp_date': exp_date,
-            'model_order': model_order,
-            'freq:': freq,
-            'offset': offset,
-            'start_day': start,
-            'end_day': end,
-            'tca': tca
-        }
-
-        self.test_data = vectorizedbacktest.compile_data(self._DATA_DIR, commodity, exp_date,   start = start, end=end)
-        signals = compile_signal(self.test_data, self.prob_table, max_order=model_order)
-        self.ensemble = ensembler(vectorizedbacktest, signals, tcas=tca)
-        self.ensemble.build()
-
-    def run(self):
-        self.results = self.ensemble.run()
-        self.performance = self.ensemble.calperformance()
-
-    def plot(self, target_col="equitycurve", ax=None):
-        return self.ensemble.plot(target_col, ax)
