@@ -1,0 +1,14 @@
+{
+    "Root path": "/home/runmin/Documents/Qishi/QishiQR",
+    "Tick path": "/home/runmin/Documents/Qishi/tick2016/",
+    "Strategy path": "/home/runmin/Documents/Qishi/Strategy",
+    "Major path": "/home/runmin/Documents/Qishi/Major_Series",
+    "Validate path": "/home/runmin/Documents/Qishi/Validate",
+    "Output path": "/home/runmin/Documents/Qishi/Output",
+    
+    "State number": 3,
+    "Max model order": 7,
+    "Frequency": 5,
+    "Offset": 0,
+    "TCA": -1
+}

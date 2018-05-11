@@ -177,7 +177,7 @@ class MajorSeries_MaxPCT:
         signals = [SLMStrategy(data, slm, m, px_th=self._price_threshold).generatingsignal() for m in range(1,model_orders+1)]
         return signals
 
-    def build(self, model_order=7, freq='5min', start='20161001', end='20161221', offset=0, tca=None):
+    def build(self, model_order=7, freq='5min', start='20161001', end='20161221', offset=0, tca=None, labels=None):
         """
         Read in Data and the probability table
 
@@ -193,10 +193,10 @@ class MajorSeries_MaxPCT:
         all_signals = all_signals.unstack(level=0)
 
         max_pct_signal = self.signals[0].copy()
-        max_pct_signal['Mac_pct signal'] = all_signals.apply(lambda x: x.signal[x.max_pct.idxmax(axis=1)], axis=1)
+        max_pct_signal['signal'] = all_signals.apply(lambda x: x.signal[x.max_pct.idxmax(axis=1)], axis=1)
         self.signals.append(max_pct_signal)
 
-        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca)
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, labels=labels)
         self.ensemble.build()
 
     def run(self):
@@ -236,7 +236,7 @@ class MajorSeries_MajorVoting:
         signals = [SLMStrategy(data, slm, m, px_th=self._price_threshold).generatingsignal() for m in range(1,model_orders+1)]
         return signals
 
-    def build(self, model_order=7, freq='5min', start='20161001', end='20161221', offset=0, tca=None):
+    def build(self, model_order=7, freq='5min', start='20161001', end='20161221', offset=0, tca=None, labels=None):
         """
         Read in Data and the probability table
 
@@ -252,10 +252,10 @@ class MajorSeries_MajorVoting:
         all_signals = all_signals.unstack(level=0)
 
         max_pct_signal = self.signals[0].copy()
-        max_pct_signal['Majorvoting signal'] = all_signals.mode(axis=1)[0]
+        max_pct_signal['signal'] = all_signals.mode(axis=1)[0]
         self.signals.append(max_pct_signal)
 
-        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca)
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, labels=labels)
         self.ensemble.build()
 
     def run(self):
