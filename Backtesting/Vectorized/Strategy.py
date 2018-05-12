@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from Utils.lm import *
 
+
 class Strategy:
     """
     Base class of strategy to generate signals
@@ -41,7 +42,7 @@ class MovingAverageStrategy(object):
         return self.data
 
 
-class SLMStrategy(Strategy):
+class SLMStrategy:
     """
     Strategy: Statistical language model
     Arguments:
@@ -49,7 +50,8 @@ class SLMStrategy(Strategy):
         m: model degree
     """
     def __init__(self, data, slm, m, price='LastPrice', **kwargs):
-        Strategy.__init__(self, data)
+        #super(SLMStrategy, self).__init__(self, data)
+        self.data = copy.deepcopy(data)  # original data set is not changed so that we can always go back
         self.slm = slm
         self.m = m
         self.price = price
@@ -57,7 +59,8 @@ class SLMStrategy(Strategy):
         # self.n = len(slm['signal'].unique())
 
     def generatingsignal(self):
-        self.data = super(SLMStrategy, self).generatingsignal()
+        #self.data = super(SLMStrategy, self).generatingsignal()
+        #self.data = super().generatingsignal()
         self.data['Direction'] = self.data[self.price].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
         sequence = self.data['Direction'].astype(str).str.cat()
         prior_ls = ['p'] * self.m + ['p' + sequence[i:i + self.m] for i in np.arange(len(sequence) - self.m)]
@@ -75,11 +78,13 @@ class SLMStrategy(Strategy):
 
 class SLM:
     def __init__(self, slm, threshold, th_type=1):
-        self._slm = slm
+        self._slm = copy.deepcopy(slm)
         self._threshold = threshold
         self._type = th_type
 
     def run(self):
+        self._slm['max'] = self._slm.loc[:, '0':'2'].idxmax(axis=1)
+        self._slm['max_pct'] = self._slm.loc[:, '0':'2'].max(axis=1) / self._slm['total']
         self._slm['min'] = self._slm.loc[:, '0':'2'].idxmin(axis=1)
         self._slm['min_pct'] = self._slm.loc[:, '0':'2'].min(axis=1) / self._slm['total']
         # difference of top 2 probablities
@@ -94,5 +99,4 @@ class SLM:
         else:
             # type 3: consider only threshold for case of 1 and 2 are top 2 probs
             self._slm['signal'] = self._slm.apply(lambda x: 0 if (x['threshold'] <= self._threshold and x['min'] == 0) else x['max'], axis=1).astype(int)
-        self._slm['signal']
-        return self._slm[['prior', 'max_pct', 'min_pct', 'signal']]
+        return self._slm#[['prior', 'max_pct', 'min_pct', 'signal']]
