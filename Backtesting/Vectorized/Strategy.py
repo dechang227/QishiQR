@@ -71,3 +71,28 @@ class SLMStrategy(Strategy):
         #set last point before closing to be 0
         #set the first m points after opening to be 0
         return self.data
+
+
+class SLM:
+    def __init__(self, slm, threshold, th_type=1):
+        self._slm = slm
+        self._threshold = threshold
+        self._type = th_type
+
+    def run(self):
+        self._slm['min'] = self._slm.loc[:, '0':'2'].idxmin(axis=1)
+        self._slm['min_pct'] = self._slm.loc[:, '0':'2'].min(axis=1) / self._slm['total']
+        # difference of top 2 probablities
+        self._slm['threshold'] = 2 * self._slm['max_pct'] + self._slm['min_pct'] - 1
+        assert self._threshold < 1
+        if self._type == 1:
+            # type 1: simple threshold cutoff
+            self._slm['signal'] = self._slm[['max', 'max_pct']].apply(lambda x: x['max'] if x['max_pct'] > self._threshold else 0, axis=1).astype(int)
+        elif self._type == 2:
+            # type 2: threshold for the difference of top 2 probs
+            self._slm['signal'] = self._slm.apply(lambda x: x['max'] if x['threshold'] > self._threshold else 0, axis=1).astype(int)
+        else:
+            # type 3: consider only threshold for case of 1 and 2 are top 2 probs
+            self._slm['signal'] = self._slm.apply(lambda x: 0 if (x['threshold'] <= self._threshold and x['min'] == 0) else x['max'], axis=1).astype(int)
+        self._slm['signal']
+        return self._slm[['prior', 'max_pct', 'min_pct', 'signal']]
