@@ -1,0 +1,14 @@
+{
+    "Root path": "C:\\Users\\Maxcell-HomePC\\QishiQR",
+    "Tick path": "C:\\Users\\Maxcell-HomePC\\QishiQR\\Data",
+    "Strategy path": "C:\\Users\\Maxcell-HomePC\\QishiQR\\Strategy",
+    "Major path": "C:\\Users\\Maxcell-HomePC\\QishiQR\\Major_Series",
+    "Validate path": "C:\\Users\\Maxcell-HomePC\\QishiQR\\Validate",
+    "Output path": "C:\\Users\\Maxcell-HomePC\\QishiQR\\Output",
+    
+    "State number": 3,
+    "Max model order": 7,
+    "Frequency": 5,
+    "Offset": 0,
+    "TCA": -1
+}
