@@ -7,7 +7,7 @@ from datetime import datetime
 from datetime import timedelta  
 
 from collections import defaultdict
-
+from multiprocessing import Pool, cpu_count
 class df_reader:
     '''
     Read ticks from all csv files satisfying some patterns in a directory.
@@ -156,8 +156,8 @@ class df_reader:
             df_offset[str(offset)] = Extract_df_offset(df, offset)
             
         return df_offset
-    
-    def gen_df(self, filenames):
+  
+    def gen_df(self, filenames, Parallel=True):
         '''
         Open a sequence of filenames one at a time producing a file object.
         The file is closed immediately when proceeding to the next iteration.
@@ -165,15 +165,26 @@ class df_reader:
         df = defaultdict(lambda: pd.DataFrame())
         
         # load all the files in the directory matching the pattern
-        for filename in filenames:
+        if Parallel:
+            print('Parallel mode on.')
+            with Pool(cpu_count()) as pool:
+                pooled_dic = pool.map(self.f_fill, filenames)
+            
+            for tmp in pooled_dic:
+                for offset in self._offset:
+                    df[str(offset)] = df[str(offset)].append(tmp[str(offset)])   
 
-            tmp = self.f_fill(filename)
-            
-            #print ('tmp: ', tmp.keys())
-            
-            for offset in self._offset:
+   
+        else:
+            for filename in filenames:
+
+                tmp = self.f_fill(filename)
                 
-                df[str(offset)] = df[str(offset)].append(tmp[str(offset)])     
+                #print ('tmp: ', tmp.keys())
+                
+                for offset in self._offset:
+                    
+                    df[str(offset)] = df[str(offset)].append(tmp[str(offset)])     
         
         # sort the dataframe in each offset
         for offset in self._offset:
