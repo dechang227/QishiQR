@@ -12,7 +12,7 @@ from Backtesting.Vectorized.backtest import vectorizedbacktest
 from Backtesting.Vectorized.cross_compare import ensembler
 
 class LmValidation:
-    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', max_order=8, offsets_average = False, n_offsets = 5):
+    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', max_order=8, offsets_average = False, n_offsets = 5, **kwargs):
         '''
         :param slm: language model dataframe having at least two columns: prior and signal
         :param symbol:
@@ -29,6 +29,7 @@ class LmValidation:
         self._n_offsets = n_offsets
         self._start = start
         self._end = end
+        self._price_threshold = kwargs.get('px_th', 0)
 
     def gen_find(self):
         '''
@@ -41,12 +42,13 @@ class LmValidation:
     def run(self, tcas=None):
         filenames = self.gen_find()
         for filename in filenames:
+            print(filename)
             data = pd.read_csv(self._data_dir + '/' + filename, index_col=0)
             data = data[(pd.to_datetime(data.index) >= pd.to_datetime(self._start)) & (pd.to_datetime(data.index) < pd.to_datetime(self._end))]
             if len(data) == 0:
                 continue
             else:
-                signals = [SLMStrategy(data, self._slm, m).generatingsignal() for m in np.arange(1, self._max_order + 1)]
+                signals = [SLMStrategy(data, self._slm, m, px_th=self._price_threshold).generatingsignal() for m in np.arange(1, self._max_order + 1)]
                 validator_ensemble = ensembler(vectorizedbacktest, signals, tcas=tcas)
                 validator_ensemble.build()
                 validator_ensemble.run()
