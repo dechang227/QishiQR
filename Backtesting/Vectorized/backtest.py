@@ -1,23 +1,48 @@
 import numpy as np
 import pandas as pd
-from Utils.IOUtils import *
-from .Strategy import *
 
 
 class vectorizedbacktest:
-    def __init__(self, data, tca = 'None'):
+    def __init__(self, data, window = 0, pct_th =0.52, tca = 'None'):
         self.data = data # price history data
         self.tca = tca # trading cost to be applied
         self.result = 'please run backtest first'
         self.performance = 'please calculate performance first'
-
+        self.window = window
+        self.pct_th = pct_th
+        
     def runtest(self):
         self.result = self.data
-        self.result['tradeID'] = (~(self.result['signal']==self.result['signal'].shift(1))).cumsum()
         self.result['return'] = np.log(self.result['LastPrice']/self.result['LastPrice'].shift(1))
         self.result['return'].iloc[0] = 0.0
-        self.result['signal_bar'] = self.result['signal'].apply(lambda x: 1 if x == 2 else (-1 if x == 1 else 0))
-        self.result['signal_bar'][0] = 0
+        self.result['correct'] = [direct == signal for direct, signal in zip(self.result['Direction'], self.result['signal'])]
+        if self.window>0:
+            signal_bar = [0]*self.window
+            self.result['correct_pct'] = self.result['correct'].shift(1).rolling(window = self.window).sum()/self.window
+        
+            total_rows = self.result.shape[0]
+        
+            for index in range(self.window, total_rows):
+                next_signal = 0 if (self.result['correct_pct'][index] > self.pct_th) else (1 if (self.result['signal'][index] == 2) else (-1 if (self.result['signal'][index] == 1)  else signal_bar[-1]))
+                signal_bar.append(next_signal)
+            self.result['signal_bar'] = signal_bar
+            
+        elif self.window == 0:
+            signal_bar = [0]
+            total_rows = self.result.shape[0]
+
+            for index in range(1, total_rows):
+                next_signal = 1 if (self.result['signal'][index] ==2) else (-1 if (self.result['signal'][index] == 1) 
+                                                                            else signal_bar[-1])
+                signal_bar.append(next_signal)
+                
+            self.result['signal_bar'] = signal_bar
+            
+        else:
+            self.result['signal_bar'] = self.result['signal'].apply(lambda x: 1 if x == 2 else (-1 if x == 1 else 0))
+            self.result['signal_bar'][0] = 0            
+        
+        self.result['tradeID'] = (~(self.result['signal']==self.result['signal'].shift(1))).cumsum()
         self.result['signal_chg_size'] = abs(self.result['signal_bar'] - self.result['signal_bar'].shift(1))
         self.result['signal_chg'] = (~(self.result['signal']==self.result['signal'].shift(1)))
         self.result['strategy'] = self.result['return'] * self.result['signal_bar']
