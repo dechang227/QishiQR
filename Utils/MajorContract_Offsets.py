@@ -127,8 +127,12 @@ class MajorContracts():
                 tick_all.sort_index(inplace=True)
                 
                 # create trade direction
-                tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > self._threshold else (1 if x < -self._threshold else 0))
-                        
+                if self._threshold >= 1:
+                    tick_all['Direction'] = tick_all['LastPrice'].diff().apply(
+                        lambda x: 2 if x > self._threshold else (1 if x < -self._threshold else 0))
+                else:
+                    tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > self._threshold else (1 if x < -self._threshold else 0))
+
                 tick_all = tick_all[(tick_all.index >= start_time) & (tick_all.index < end_time)]
                         
                 majorcontracts[k] = majorcontracts[k].append(tick_all)

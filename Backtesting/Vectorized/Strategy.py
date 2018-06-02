@@ -14,7 +14,18 @@ class Strategy:
     def generatingsignal(self):
         # self.data['signal'] = 0  # initiate all signal position to 0
         return self.data
-
+    
+class RandomForecastingStrategy(Strategy):
+    # random generated signal for bactekster validation
+    def __init__(self, data, m = 0):
+        Strategy.__init__(self, data)
+        self._m = m #module order
+    def generatingsignal(self):
+        signal_len = self.data.shape[0]
+        self.data['signal'] = np.random.random_integers(0,2,signal_len)
+        self.data['signal'][0:5] = 0
+        self.data['max_pct'] = 0
+        return self.data
 
 class MovingAverageStrategy(object):
     """
@@ -61,7 +72,12 @@ class SLMStrategy:
     def generatingsignal(self):
         #self.data = super(SLMStrategy, self).generatingsignal()
         #self.data = super().generatingsignal()
-        self.data['Direction'] = self.data[self.price].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
+        if self._price_threshold >= 1:
+            self.data['Direction'] = self.data[self.price].diff().apply(
+                lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
+        else:
+            self.data['Direction'] = self.data[self.price].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
+
         sequence = self.data['Direction'].astype(str).str.cat()
         prior_ls = ['p'] * self.m + ['p' + sequence[i:i + self.m] for i in np.arange(len(sequence) - self.m)]
         # print(len(prior_ls))
@@ -89,6 +105,8 @@ class SLM:
         self._slm['min_pct'] = self._slm.loc[:, '0':'2'].min(axis=1) / self._slm['total']
         # difference of top 2 probablities
         self._slm['threshold'] = 2 * self._slm['max_pct'] + self._slm['min_pct'] - 1
+        self._slm['order'] = self._slm['prior'].apply(len)
+        self._slm = self._slm.sort_values(by='order').reset_index().drop(columns=['index'])
         assert self._threshold < 1
         if self._type == 1:
             # type 1: simple threshold cutoff
@@ -96,7 +114,10 @@ class SLM:
         elif self._type == 2:
             # type 2: threshold for the difference of top 2 probs
             self._slm['signal'] = self._slm.apply(lambda x: x['max'] if x['threshold'] > self._threshold else 0, axis=1).astype(int)
-        else:
+        elif self._type == 3:
             # type 3: consider only threshold for case of 1 and 2 are top 2 probs
-            self._slm['signal'] = self._slm.apply(lambda x: 0 if (x['threshold'] <= self._threshold and x['min'] == 0) else x['max'], axis=1).astype(int)
+            print(3)
+            self._slm['signal'] = self._slm.apply(lambda x: 0 if (x['threshold'] <= self._threshold and x['min'] == '0') else x['max'], axis=1).astype(int)
+        else:
+            self._slm['signal'] = self._slm['max']
         return self._slm#[['prior', 'max_pct', 'min_pct', 'signal']]
