@@ -54,6 +54,19 @@ class LmValidation:
             if len(data) == 0:
                 continue
             else:
+                
+                ##SQ: add start trade and end trade flag
+                data['TimeStamp']=pd.to_datetime(data.index)
+                data['tm2preTrade'] = (data['TimeStamp']-data['TimeStamp'].shift(1))/ np.timedelta64(1, 'm')
+                data['flag_start_trade'] = 0
+                data.loc[(data.tm2preTrade > 300) | data.tm2preTrade.isnull(),'flag_start_trade'] = 1
+
+                data['tm2nextTrade'] = (data['TimeStamp'].shift(-1)-data['TimeStamp'])/ np.timedelta64(1, 'm')
+                data['flag_end_trade'] = 0
+                data.loc[(data.tm2nextTrade > 300) | data.tm2nextTrade.isnull(),'flag_end_trade'] = 1
+                data.drop(['tm2nextTrade', 'tm2preTrade'], axis=1, inplace=True)
+
+
                 signals = [SLMStrategy(data, self._slm, m).generatingsignal() for m in np.arange(1, self._max_order + 1)]
                 ##SQ: signals is a list, each element is a data.frame of signals with model of order m
                 validator_ensemble = ensembler(vectorizedbacktest, signals, tcas=tcas)
@@ -86,12 +99,24 @@ class LmValidation:
                     if not self._average_return:
                         self._average_return = [df['strategy'] for df in validator_ensemble.results]
                         average_performance = performance
-                        average_benchmark = validator_ensemble.results[0]['LastPrice']
+                        # average_benchmark = validator_ensemble.results[0]['LastPrice']
+                        ## SQ change to 'return' to keep consistency
+                        average_benchmark = validator_ensemble.results[0]['return']
+
                     else:
                         self._average_return = [df1.add(df2['strategy'], fill_value=0) for (df1, df2) in zip(self._average_return, validator_ensemble.results)]
                         average_performance = average_performance.add(performance, fill_value=0)
-                        average_benchmark = average_benchmark.add(validator_ensemble.results[0]['LastPrice'], fill_value=0)
-                
+                        
+                        ## average_benchmark = average_benchmark.add(validator_ensemble.results[0]['LastPrice'], fill_value=0)
+                        ## SQ change to 'return' to keep consistency
+                        average_benchmark = average_benchmark.add(validator_ensemble.results[0]['return'], fill_value=0)
+    
+                ##SQ till now
+                ##  self.average_return is a list, each element is a df corresponding to an order
+                ##  the order within each df is grouped by offset
+                ##  average_benchmark is also grouped by offset, needed to sort by index
+#            return [average_benchmark,average_performance]
+
         '''
             average return of all offsets
             '''
@@ -99,7 +124,10 @@ class LmValidation:
             average_benchmark = average_benchmark[average_benchmark.index!=0].to_frame()
             average_benchmark['Date'] = pd.to_datetime(average_benchmark.index)
             average_benchmark.sort_values(['Date'],inplace=True)
-            average_benchmark['return'] = average_benchmark['LastPrice']/average_benchmark['LastPrice'].iloc[0]
+            ## average_benchmark['return'] = 1 + np.log(average_benchmark['LastPrice']/average_benchmark['LastPrice'].iloc[0])
+            ## SQ change to 'return' to keep consistency
+            average_benchmark['return'] = 1+average_benchmark['return'].divide(5, fill_value=0).cumsum()
+
             fig = plt.figure()
             plt.plot(average_benchmark['Date'], average_benchmark['return'],label='benchmark')
             for avg_return, label in zip(self._average_return, np.arange(2, 2+len(self._average_return))):
@@ -120,6 +148,7 @@ class LmValidation:
             average_performance = average_performance.divide(self._n_offsets)
             print(average_performance)
             average_performance.to_csv(self._valid_dir + '/performance_' + self._symbol + '.csv')
+
 
 #        if self._offsets_average and (self._average_return is not None):
 #            self._average_return = [(1+df.divide(self._n_offsets)).cumprod() for df in self._average_return]
