@@ -12,7 +12,7 @@ from Backtesting.Vectorized.backtest import vectorizedbacktest
 from Backtesting.Vectorized.cross_compare import ensembler
 
 class LmValidation:
-    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', max_order=8, offsets_average = False, n_offsets = 5):
+    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', min_order=1, max_order=8, offsets_average = False, n_offsets = 5):
         '''
         :param slm: language model dataframe having at least two columns: prior and signal
         :param symbol:
@@ -23,6 +23,7 @@ class LmValidation:
         self._symbol = symbol
         self._data_dir = data_dir
         self._valid_dir = valid_dir
+        self._min_order = min_order
         self._max_order = max_order
         self._offsets_average = offsets_average
         self._average_return = None
@@ -46,7 +47,7 @@ class LmValidation:
             if len(data) == 0:
                 continue
             else:
-                signals = [SLMStrategy(data, self._slm, m).generatingsignal() for m in np.arange(1, self._max_order + 1)]
+                signals = [SLMStrategy(data, self._slm, m).generatingsignal() for m in np.arange(self._min_order+1, self._max_order + 1)]
                 validator_ensemble = ensembler(vectorizedbacktest, signals, tcas=tcas)
                 validator_ensemble.build()
                 validator_ensemble.run()

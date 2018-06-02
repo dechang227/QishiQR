@@ -157,7 +157,7 @@ class df_reader:
             
         return df_offset
   
-    def gen_df(self, filenames, Parallel=True):
+    def gen_df(self, filenames, Parallel=False):
         '''
         Open a sequence of filenames one at a time producing a file object.
         The file is closed immediately when proceeding to the next iteration.
@@ -167,7 +167,7 @@ class df_reader:
         # load all the files in the directory matching the pattern
         if Parallel:
             print('Parallel mode on.')
-            with Pool(cpu_count()) as pool:
+            with Pool(cpu_count()-2) as pool:
                 pooled_dic = pool.map(self.f_fill, filenames)
             
             for tmp in pooled_dic:

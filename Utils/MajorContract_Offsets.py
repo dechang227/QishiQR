@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import sys
 
-from IO_Offsets import df_reader
+from Utils.IO_Offsets import df_reader
 
 from collections import defaultdict
 
