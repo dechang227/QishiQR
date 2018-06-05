@@ -61,8 +61,10 @@ class vectorizedbacktest:
         return self.result
  
     def calperformance(self):
-        self.result['benchmark'] = self.result['return'].cumsum() + 1
-        self.result['equitycurve'] = self.result['strategy'].cumsum() + 1
+        #self.result['benchmark'] = self.result['return'].cumsum() + 1
+        #self.result['equitycurve'] = self.result['strategy'].cumsum() + 1
+        self.result['benchmark'] = (self.result['return'] + 1).cumpod()
+        self.result['equitycurve'] = (self.result['strategy'] + 1).cumpod()
         self.result['drawdown'] = self.result['equitycurve']/(self.result['equitycurve'].expanding().max())-1
         drawdown_max = self.result['drawdown'].min()
         # regroup to calculate daily return, this is used to calculate the annualized std and sharpe ratio
@@ -73,11 +75,10 @@ class vectorizedbacktest:
         vol = daily_returns.std() * ((250)**0.5)
         average_daily_return = daily_returns.mean()
         total_return = self.result['equitycurve'].iloc[-1]
-        with np.errstate(divide='raise'):
-            try:
-                sharpe = (average_daily_return * 250) / vol
-            except Warning:
-                sharpe = 0
+        if vol == 0:
+            sharpe = 0
+        else:
+            sharpe = (average_daily_return * 250) / vol
         
         #average_daily_excess_return = daily_exess_return.mean()
         #excess_vol = daily_excess_return.std() * ((250)**0.5)
