@@ -17,8 +17,8 @@ class Config:
     tca = -1
 
     start = datetime.date(2016, 1, 1)
-    split = datetime.date(2016, 7, 31)
-    end = datetime.date(2016, 10, 31)
+    split = datetime.date(2016, 7, 1)
+    end = datetime.date(2016, 12, 31)
 
 
 class BuConfig(Config):
