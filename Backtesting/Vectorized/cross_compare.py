@@ -12,7 +12,7 @@ from Backtesting.Vectorized.Strategy import MovingAverageStrategy, SLMStrategy
 from Backtesting.Vectorized.backtest import vectorizedbacktest
 
 class ensembler:
-    def __init__(self, tester, signals, tcas=None, labels=None):
+    def __init__(self, tester, signals, price='LastPrice', tcas=None, labels=None):
         """
         Create an ensembler that includes backtester ensemble with different parameters
 
@@ -23,6 +23,8 @@ class ensembler:
         self.backtester = tester
         self.signals = signals
         self.tcas = tcas
+        self.price = price
+
         try:
             assert len(labels) == len(self.signals), 'Labels does not match signal'
             self.labels = labels
@@ -42,9 +44,9 @@ class ensembler:
 
         # TODO: May change to generator to save memory
         if self.tcas is not None:
-            self.ensembles = [vectorizedbacktest(signal, tca) for signal, tca in zip(self.signals, self.tcas)]
+            self.ensembles = [vectorizedbacktest(signal, tca, price=self.price) for signal, tca in zip(self.signals, self.tcas)]
         else:
-            self.ensembles = [vectorizedbacktest(signal) for signal in self.signals]
+            self.ensembles = [vectorizedbacktest(signal, price=self.price) for signal in self.signals]
 
         return self.ensembles
 
@@ -95,8 +97,8 @@ class ensembler:
         return ax
 
 
-def compile_signal(data, slm, max_order=8):
+def compile_signal(data, slm, max_order=8, price='LastPrice'): 
     slm = slm[['prior', 'max']]
     slm = slm.rename(columns={'max': 'signal'})
-    signals = [SLMStrategy(data, slm, m).generatingsignal() for m in np.arange(1, max_order+1)]
+    signals = [SLMStrategy(data, slm, m, price).generatingsignal() for m in np.arange(1, max_order+1)]
     return signals
