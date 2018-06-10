@@ -3,7 +3,7 @@ import pandas as pd
 
 
 class vectorizedbacktest:
-    def __init__(self, data, window = 0, pct_th =0.52, tca = 'None', price='LastPrice'):
+    def __init__(self, data, tca = 'None', price='LastPrice', fixed_cost=0.00052, pct_th =0.52, window = 0):
         self.data = data # price history data
         self.tca = tca # trading cost to be applied
         self.result = 'please run backtest first'
@@ -11,6 +11,7 @@ class vectorizedbacktest:
         self.window = window
         self.pct_th = pct_th
         self.price = price
+        self.fixed_cost = fixed_cost
         
     def runtest(self):
         self.result = self.data
@@ -56,7 +57,7 @@ class vectorizedbacktest:
         #  
         if(self.tca == 'Fixed' or self.tca == 'Compound'):
             #0.00012 is trading cost, 0.0004 is for bid-ask spread to count
-            self.result['strategy'] = self.result['strategy']-0.00052*self.result['signal_chg']
+            self.result['strategy'] = self.result['strategy']-self.fixed_cost*self.result['signal_chg']
         
         self.result.index = self.data.index
         return self.result

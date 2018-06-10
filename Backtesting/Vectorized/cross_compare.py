@@ -12,7 +12,7 @@ from Backtesting.Vectorized.Strategy import MovingAverageStrategy, SLMStrategy
 from Backtesting.Vectorized.backtest import vectorizedbacktest
 
 class ensembler:
-    def __init__(self, tester, signals, price='LastPrice', tcas=None, labels=None):
+    def __init__(self, tester, signals, price='LastPrice', tcas=None, labels=None, fixed_cost=0.00052):
         """
         Create an ensembler that includes backtester ensemble with different parameters
 
@@ -24,6 +24,7 @@ class ensembler:
         self.signals = signals
         self.tcas = tcas
         self.price = price
+        self.fixed_cost = fixed_cost
 
         try:
             assert len(labels) == len(self.signals), 'Labels does not match signal'
@@ -44,9 +45,9 @@ class ensembler:
 
         # TODO: May change to generator to save memory
         if self.tcas is not None:
-            self.ensembles = [vectorizedbacktest(signal, tca, price=self.price) for signal, tca in zip(self.signals, self.tcas)]
+            self.ensembles = [vectorizedbacktest(signal, tca, price=self.price, fixed_cost=self.fixed_cost) for signal, tca in zip(self.signals, self.tcas)]
         else:
-            self.ensembles = [vectorizedbacktest(signal, price=self.price) for signal in self.signals]
+            self.ensembles = [vectorizedbacktest(signal, price=self.price, fixed_cost=self.fixed_cost) for signal in self.signals]
 
         return self.ensembles
 
