@@ -126,12 +126,12 @@ class df_reader:
                 # night start time:
                 night_end = {
                     'ag': ' 2:30:00.0',        # Ag: 02:30am
-                    'bu': ' 1:00:00.0',        # Bu: 01:00am
+                    'bu': ' 23:00:00.0',        # Bu: 01:00am
                     'rb': ' 23:00:00.0',        # Rb: 23:00pm
                     'ru': ' 23:00:00.0',        # Ru: 23:00pm
                     'zn': ' 1:00:00.0'         # Zn: 01:00am
                 }
-                if self._symbol in ['rb', 'ru']:
+                if self._symbol in ['bu', 'rb', 'ru']:
                     day2 = dates[0]
                 else:
                     day2 = dates[-1]
