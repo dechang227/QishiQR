@@ -106,7 +106,7 @@ class SLM:
         # difference of top 2 probablities
         self._slm['threshold'] = 2 * self._slm['max_pct'] + self._slm['min_pct'] - 1
         self._slm['order'] = self._slm['prior'].apply(len)
-        self._slm = self._slm.sort_values(by='order').reset_index().drop(columns=['index'])
+        self._slm = self._slm.sort_values(by='order').reset_index(drop=True)#.drop(columns=['index'])
         assert self._threshold < 1
         if self._type == 1:
             # type 1: simple threshold cutoff

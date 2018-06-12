@@ -12,7 +12,7 @@ from Backtesting.Vectorized.backtest import vectorizedbacktest
 from Backtesting.Vectorized.cross_compare import ensembler
 
 class LmValidation:
-    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', min_order=1, max_order=8, offsets_average = False, n_offsets = 5):
+    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', min_order=1, max_order=8, offsets_average = False, n_offsets = 5, **kwargs):
         '''
         :param slm: language model dataframe having at least two columns: prior and signal
         :param symbol:
