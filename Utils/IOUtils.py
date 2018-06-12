@@ -99,6 +99,7 @@ class df_reader:
             print(filename + " is empty")
             return df
         # Obtain the trading dates in the file
+        df =df[df['TimeStamp']>0]
         dates = [str(day) for day in df['Date'].unique()]  
         self.dates = dates
         #print(dates)
