@@ -2,13 +2,13 @@ import datetime
 
 
 class Config:
-    root_path = "C:/Users/Shufang/Documents/Qishi_QR"
-    tick_path = "C:/Users/Shufang/Documents/Qishi_QR/Data"
-    dataset_path = "C:/Users/Shufang/Documents/Qishi_QR/Data"
-    strategy_path = "C:/Users/Shufang/Documents/Qishi_QR/Strategy"
-    major_path = "C:/Users/Shufang/Documents/Qishi_QR/Major_Series"
-    validate_path = "C:/Users/Shufang/Documents/Qishi_QR/Validate"
-    output_path = "C:/Users/Shufang/Documents/Qishi_QR/Output"
+    root_path = "C:/Users/Gang/Documents/Qishi_QR"
+    tick_path = "C:/Users/Gang/Documents/Qishi_QR/Data"
+    dataset_path = "C:/Users/Gang/Documents/Qishi_QR/Data"
+    strategy_path = "C:/Users/Gang/Documents/Qishi_QR/Strategy"
+    major_path = "C:/Users/Gang/Documents/Qishi_QR/Major_Series"
+    validate_path = "C:/Users/Gang/Documents/Qishi_QR/Validate"
+    output_path = "C:/Users/Gang/Documents/Qishi_QR/Output"
 
     state_number = 3
     max_model_order = 7
