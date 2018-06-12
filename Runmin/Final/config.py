@@ -55,3 +55,20 @@ class RbConfig(Config):
     def __init__(self, frequency = 5):
         super(RbConfig, self).__init__()
         self.frequency = frequency
+        
+class RuConfig(Config):
+    symbol = 'ru'
+
+    maturity = {'1605': ['2015-11-1', '2016-5-16'],
+                '1609': ['2016-2-1', '2016-8-19'],
+                '1701': ['2016-6-1', '2016-12-15'],
+                '1705': ['2016-11-15', '2017-1-31']}
+
+    transition = {'1605': '2016-3-17',
+                  '1609': '2016-8-1',
+                  '1701': '2016-11-23',
+                  '1705': '2017-1-1'}
+
+    def __init__(self, frequency = 5):
+        super(RuConfig, self).__init__()
+        self.frequency = frequency

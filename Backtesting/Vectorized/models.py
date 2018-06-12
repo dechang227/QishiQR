@@ -107,7 +107,7 @@ class MajorSeriesTest:
     """
     Test ONE major series with different orders
     """
-    def __init__(self, major_series, OUTPUT_DIR, prob_table, px_th=0.0):
+    def __init__(self, major_series, OUTPUT_DIR, prob_table, price='LastPrice', px_th=0.0):
         """
         Read in Data and the probability table
 
@@ -121,13 +121,14 @@ class MajorSeriesTest:
         self.signals = None
         self.prob_table = prob_table
         self._price_threshold = px_th
+        self.price = price
 
-    def compile_signal(self, data, slm, model_orders):
+    def compile_signal(self, data, slm, model_orders, price='LastPrice'):
         """
         Generate signals for different orders
         """
 
-        signals = [SLMStrategy(data, slm, m, px_th=self._price_threshold).generatingsignal() for m in range(1,model_orders+1)]
+        signals = [SLMStrategy(data, slm, m, price=price, px_th=self._price_threshold).generatingsignal() for m in range(1,model_orders+1)]
 
         return signals
 
@@ -139,8 +140,8 @@ class MajorSeriesTest:
             model_order: int or list. Number of model orders
         """
         self.test_data = self.test_data[(self.test_data.index >= start) & (self.test_data.index < end)]
-        self.signals = self.compile_signal(self.test_data, self.prob_table, model_orders=model_order)
-        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca)
+        self.signals = self.compile_signal(self.test_data, self.prob_table, model_orders=model_order, price=self.price)
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, price=self.price)
         self.ensemble.build()
 
     def run(self):
@@ -154,7 +155,7 @@ class MajorSeries_MaxPCT:
     """
     Test ONE major series with different orders
     """
-    def __init__(self, major_series, OUTPUT_DIR, prob_table, px_th=0.0):
+    def __init__(self, major_series, OUTPUT_DIR, prob_table, price='LastPrice', px_th=0.0):
         """
         Read in Data and the probability table
 
@@ -168,13 +169,14 @@ class MajorSeries_MaxPCT:
         self.signals = None
         self.prob_table = prob_table
         self._price_threshold = px_th
+        self.price = price
 
-    def compile_signal(self, data, slm, model_orders):
+    def compile_signal(self, data, slm, model_orders, price):
         """
         Generate signals for different orders
         """
 
-        signals = [SLMStrategy(data, slm, m, px_th=self._price_threshold).generatingsignal() for m in range(1,model_orders+1)]
+        signals = [SLMStrategy(data, slm, m, price=price, px_th=self._price_threshold).generatingsignal() for m in range(1,model_orders+1)]
         return signals
 
     def build(self, model_order=7, freq='5min', start='20161001', end='20161221', offset=0, tca=None, labels=None):
@@ -185,7 +187,7 @@ class MajorSeries_MaxPCT:
             model_order: int or list. Number of model orders
         """
         self.test_data = self.test_data[(self.test_data.index >= start) & (self.test_data.index < end)]
-        self.signals = self.compile_signal(self.test_data, self.prob_table, model_orders=model_order)
+        self.signals = self.compile_signal(self.test_data, self.prob_table, price=self.price, model_orders=model_order)
         
 
         all_signals = pd.concat([df[['signal','max_pct']] for df in self.signals], axis=0, keys=range(1, model_order+1))
@@ -196,7 +198,7 @@ class MajorSeries_MaxPCT:
         max_pct_signal['signal'] = all_signals.apply(lambda x: x.signal[x.max_pct.idxmax(axis=1)], axis=1)
         self.signals.append(max_pct_signal)
 
-        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, labels=labels)
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, labels=labels, price=self.price)
         self.ensemble.build()
 
     def run(self):

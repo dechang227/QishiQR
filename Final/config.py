@@ -37,7 +37,6 @@ class RuConfig(Config):
         super(RuConfig, self).__init__()
         self.frequency = frequency
 
-
 class BuConfig(Config):
     symbol = 'bu'
 
@@ -46,7 +45,7 @@ class BuConfig(Config):
                 '1612': ['2016-6-1', '2016-11-15'],
                 '1706': ['2016-10-15', '2017-1-31']}
 
-    transition = {'1606': '2016-3-1',
+    transition = {'1606': '2016-4-1',
                   '1609': '2016-7-1',
                   '1612': '2016-11-1',
                   '1706': '2017-1-1'}
@@ -81,7 +80,7 @@ class AgConfig(Config):
                 '1706': ['2016-6-1', '2017-1-31']}
 
     transition = {'1606': '2016-4-1',
-                  '1612': '2016-7-1',
+                  '1612': '2016-10-15',
                   '1706': '2017-1-1'}
 
     def __init__(self, frequency = 5):

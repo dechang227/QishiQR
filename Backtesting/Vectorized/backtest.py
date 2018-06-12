@@ -3,17 +3,19 @@ import pandas as pd
 
 
 class vectorizedbacktest:
-    def __init__(self, data, window = 0, pct_th =0.52, tca = 'None'):
+    def __init__(self, data, tca = 'None', price='LastPrice', fixed_cost=0.00052, pct_th =0.52, window = 0):
         self.data = data # price history data
         self.tca = tca # trading cost to be applied
         self.result = 'please run backtest first'
         self.performance = 'please calculate performance first'
         self.window = window
         self.pct_th = pct_th
+        self.price = price
+        self.fixed_cost = fixed_cost
         
     def runtest(self):
         self.result = self.data
-        self.result['return'] = np.log(self.result['LastPrice']/self.result['LastPrice'].shift(1))
+        self.result['return'] = np.log(self.result[self.price]/self.result[self.price].shift(1))
         self.result['return'].iloc[0] = 0.0
         #better to be put into class Strategy
         self.result['correct'] = [direct == signal for direct, signal in zip(self.result['Direction'], self.result['signal'])]
@@ -55,14 +57,16 @@ class vectorizedbacktest:
         #  
         if(self.tca == 'Fixed' or self.tca == 'Compound'):
             #0.00012 is trading cost, 0.0004 is for bid-ask spread to count
-            self.result['strategy'] = self.result['strategy']-0.00052*self.result['signal_chg']
+            self.result['strategy'] = self.result['strategy']-self.fixed_cost*self.result['signal_chg']
         
         self.result.index = self.data.index
         return self.result
  
     def calperformance(self):
-        self.result['benchmark'] = self.result['return'].cumsum() + 1
-        self.result['equitycurve'] = self.result['strategy'].cumsum() + 1
+        #self.result['benchmark'] = self.result['return'].cumsum() + 1
+        #self.result['equitycurve'] = self.result['strategy'].cumsum() + 1
+        self.result['benchmark'] = (self.result['return'] + 1).cumprod()
+        self.result['equitycurve'] = (self.result['strategy'] + 1).cumprod()
         self.result['drawdown'] = self.result['equitycurve']/(self.result['equitycurve'].expanding().max())-1
         drawdown_max = self.result['drawdown'].min()
         # regroup to calculate daily return, this is used to calculate the annualized std and sharpe ratio
@@ -73,11 +77,10 @@ class vectorizedbacktest:
         vol = daily_returns.std() * ((250)**0.5)
         average_daily_return = daily_returns.mean()
         total_return = self.result['equitycurve'].iloc[-1]
-        with np.errstate(divide='raise'):
-            try:
-                sharpe = (average_daily_return * 250) / vol
-            except Warning:
-                sharpe = 0
+        if vol == 0:
+            sharpe = 0
+        else:
+            sharpe = (average_daily_return * 250) / vol
         
         #average_daily_excess_return = daily_exess_return.mean()
         #excess_vol = daily_excess_return.std() * ((250)**0.5)

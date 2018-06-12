@@ -16,6 +16,7 @@ class MajorContracts():
                                               '1609':['2016-3-1','2016-6-1'],
                                               '1701':['2016-7-1','2016-11-1'],
                                               '1705':['2016-11-1','2017-3-1']},
+                        price='LastPrice',
                         **kwargs):
         
         self._symbol  = symbol
@@ -33,6 +34,8 @@ class MajorContracts():
         # states = 3. order = 8.
         self._m = 3
         self._n = 8
+
+        self._price = price
         
      
     def ternary (self, k, l):
@@ -125,13 +128,17 @@ class MajorContracts():
                                 
                 tick_all = pd.concat([tick_day[k], tick_night[k]])
                 tick_all.sort_index(inplace=True)
-                
+
+                # create mid price
+                if self._price is 'MidPrice':
+                    tick_all['MidPrice'] = (tick_all['AskPrice1']+tick_all['BidPrice1'])/2.0
+
                 # create trade direction
                 if self._threshold >= 1:
-                    tick_all['Direction'] = tick_all['LastPrice'].diff().apply(
+                    tick_all['Direction'] = tick_all[self._price].diff().apply(
                         lambda x: 2 if x > self._threshold else (1 if x < -self._threshold else 0))
                 else:
-                    tick_all['Direction'] = tick_all['LastPrice'].pct_change().apply(lambda x: 2 if x > self._threshold else (1 if x < -self._threshold else 0))
+                    tick_all['Direction'] = tick_all[self._price].pct_change().apply(lambda x: 2 if x > self._threshold else (1 if x < -self._threshold else 0))
 
                 tick_all = tick_all[(tick_all.index >= start_time) & (tick_all.index < end_time)]
                         
