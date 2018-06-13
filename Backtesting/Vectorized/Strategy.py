@@ -116,7 +116,6 @@ class SLM:
             self._slm['signal'] = self._slm.apply(lambda x: x['max'] if x['threshold'] > self._threshold else 0, axis=1).astype(int)
         elif self._type == 3:
             # type 3: consider only threshold for case of 1 and 2 are top 2 probs
-            print(3)
             self._slm['signal'] = self._slm.apply(lambda x: 0 if (x['threshold'] <= self._threshold and x['min'] == '0') else x['max'], axis=1).astype(int)
         else:
             self._slm['signal'] = self._slm['max']

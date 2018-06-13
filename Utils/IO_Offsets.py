@@ -157,7 +157,7 @@ class df_reader:
             
         return df_offset
   
-    def gen_df(self, filenames, Parallel=False):
+    def gen_df(self, filenames, Parallel=True):
         '''
         Open a sequence of filenames one at a time producing a file object.
         The file is closed immediately when proceeding to the next iteration.
