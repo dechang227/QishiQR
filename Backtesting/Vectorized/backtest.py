@@ -60,6 +60,9 @@ class vectorizedbacktest:
             self.result['strategy'] = self.result['strategy']-self.fixed_cost*self.result['signal_chg']
         
         self.result.index = self.data.index
+        # filter out the fake price change caused by switching of major contract
+        self.result['strategy'] = self.result['strategy'].apply(lambda x: 0 if abs(x)>0.05 else x)
+        self.result['return'] = self.result['return'].apply(lambda x: 0 if abs(x)>0.05 else x)
         return self.result
  
     def calperformance(self):

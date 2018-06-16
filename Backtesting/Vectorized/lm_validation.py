@@ -79,7 +79,7 @@ class LmValidation:
                     if not self._average_return:
                         self._average_return = [df['strategy'].reset_index(drop=True) for df in validator_ensemble.results]
                         average_performance = performance
-                        average_benchmark = validator_ensemble.results[0]['LastPrice']
+                        average_benchmark = validator_ensemble.results[0]['benchmark']
                         #avg_equitycurve = [df['equitycurve'].reset_index(drop=True) for df in validator_ensemble.results]
                     else:
                         self._average_return = [df1.add(df2['strategy'].reset_index(drop=True), fill_value=0) for (df1, df2) in zip(self._average_return, validator_ensemble.results)]
@@ -92,7 +92,7 @@ class LmValidation:
         if self._offsets_average and (self._average_return is not None):
             self._average_return = [(1+df.divide(self._n_offsets)).cumprod() for df in self._average_return]
             #avg_equitycurve = [df.divide(self._n_offsets) for df in avg_equitycurve]
-            average_benchmark = average_benchmark/average_benchmark[0]
+            #average_benchmark = average_benchmark/average_benchmark[0]
             average_benchmark = average_benchmark.to_frame()
             average_benchmark['Date'] = pd.to_datetime(average_benchmark.index)
             #print(average_benchmark)
