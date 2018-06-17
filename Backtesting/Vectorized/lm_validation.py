@@ -97,7 +97,7 @@ class LmValidation:
             average_benchmark['Date'] = pd.to_datetime(average_benchmark.index)
             #print(average_benchmark)
             fig = plt.figure()
-            plt.plot(average_benchmark.Date, average_benchmark.benchmark, label='benchmark')
+            plt.plot(average_benchmark.Date, average_benchmark.benchmark, label='b')
             for avg_return, label in zip(self._average_return, np.arange(2, 2+len(self._average_return))):
             #for avg_return, label in zip(avg_equitycurve, np.arange(2, 2 + len(avg_equitycurve))):
                 #avg_return.plot(label=label)
