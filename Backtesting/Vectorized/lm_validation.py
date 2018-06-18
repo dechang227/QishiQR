@@ -12,7 +12,7 @@ from Backtesting.Vectorized.backtest import vectorizedbacktest
 from Backtesting.Vectorized.cross_compare import ensembler
 
 class LmValidation:
-    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', min_order=1, max_order=8, offsets_average = False, n_offsets = 5, price='LastPrice', **kwargs):
+    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', min_order=1, max_order=8, offsets_average = False, n_offsets = 5, tca = None, price='LastPrice', fixed_cost = 0.00052,**kwargs):
         '''
         :param slm: language model dataframe having at least two columns: prior and signal
         :param symbol:
@@ -32,6 +32,8 @@ class LmValidation:
         self._end = end
         self._price_threshold = kwargs.get('px_th', 0)
         self._price=price
+        self._tca = tca
+        self._fixed_cost = fixed_cost
 
     def gen_find(self):
         '''
@@ -41,7 +43,7 @@ class LmValidation:
             for name in fnmatch.filter(filelist, self._symbol + '*'):
                 yield name
 
-    def run(self, tcas=None, fixed_cost=0.0003):
+    def run(self):
         filenames = self.gen_find()
         for filename in filenames:
             print(filename)
@@ -52,7 +54,8 @@ class LmValidation:
             else:
 
                 signals = [SLMStrategy(data, self._slm, m, px_th=self._price_threshold).generatingsignal() for m in np.arange(self._min_order+1, self._max_order + 1)]
-                validator_ensemble = ensembler(vectorizedbacktest, signals, price=self._price, tcas=tcas, fixed_cost=fixed_cost)
+                tcas = [self._tca for m in np.arange(self._min_order+1, self._max_order + 1)]
+                validator_ensemble = ensembler(vectorizedbacktest, signals, price=self._price, tcas = tcas, fixed_cost=self._fixed_cost)
                 validator_ensemble.build()
                 validator_ensemble.run()
 
