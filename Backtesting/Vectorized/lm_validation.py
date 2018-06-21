@@ -12,7 +12,7 @@ from Backtesting.Vectorized.backtest import vectorizedbacktest
 from Backtesting.Vectorized.cross_compare import ensembler
 
 class LmValidation:
-    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', min_order=1, max_order=8, offsets_average = False, n_offsets = 5, tca = None, price='LastPrice', fixed_cost = 0.00052,**kwargs):
+    def __init__(self, slm, start='2016-7-1', end='2016-10-1',symbol='ag', data_dir=r'../../Output', valid_dir=r'../../Validation', min_order=2, max_order=8, offsets_average = False, n_offsets = 5, tca = None, price='LastPrice', fixed_cost = 0.00052,**kwargs):
         '''
         :param slm: language model dataframe having at least two columns: prior and signal
         :param symbol:
@@ -52,9 +52,9 @@ class LmValidation:
             if len(data) == 0:
                 continue
             else:
-
-                signals = [SLMStrategy(data, self._slm, m, px_th=self._price_threshold).generatingsignal() for m in np.arange(self._min_order+1, self._max_order + 1)]
-                tcas = [self._tca for m in np.arange(self._min_order+1, self._max_order + 1)]
+                signals = [SLMStrategy(data, self._slm, m-1, px_th=self._price_threshold).generatingsignal() for m in np.arange(self._min_order, self._max_order+1)]
+                #tcas = [self._tca for m in np.arange(self._min_order + 1, self._max_order + 1)]
+                tcas = [self._tca]*(self._max_order - self._min_order + 1)
                 validator_ensemble = ensembler(vectorizedbacktest, signals, price=self._price, tcas = tcas, fixed_cost=self._fixed_cost)
                 validator_ensemble.build()
                 validator_ensemble.run()
@@ -101,7 +101,7 @@ class LmValidation:
             #print(average_benchmark)
             fig = plt.figure()
             plt.plot(average_benchmark.Date, average_benchmark.benchmark, label='b')
-            for avg_return, label in zip(self._average_return, np.arange(2, 2+len(self._average_return))):
+            for avg_return, label in zip(self._average_return, np.arange(self._min_order, self._max_order+1)):
             #for avg_return, label in zip(avg_equitycurve, np.arange(2, 2 + len(avg_equitycurve))):
                 #avg_return.plot(label=label)
                 df = avg_return.to_frame()
