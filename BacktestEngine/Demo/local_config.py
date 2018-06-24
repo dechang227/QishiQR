@@ -4,21 +4,25 @@ import datetime
 class Config:
     """ Global base configuration. Original in Backtesting.Vectorized.config """
 
-    root_path = "/home/rz14/Documents/QR_Qishi/QishiQR/"
-    tick_path = "/home/rz14/Documents/QR_Qishi/tick2016/"
-    strategy_path = "/home/rz14/Documents/QR_Qishi/Strategy/"
-    validate_path = "/home/rz14/Documents/QR_Qishi/Validate/"
-    output_path = "/home/rz14/Documents/QR_Qishi/QishiQR/Output/"
+    root_path = "/home/runmin/Documents/Qishi/QishiQR/"
+    tick_path = "/home/runmin/Documents/Qishi/tick2016/"
+    strategy_path = "/home/runmin/Documents/Qishi/Strategy/"
+    validate_path = "/home/runmin/Documents/Qishi/Validate/"
+    output_path = "/home/runmin/Documents/Qishi/QishiQR/Output/"
 
+    price = "LastPrice"
     state_number = 3
     max_model_order = 7
     frequency = 5
     offset = 0
     tca = -1
+  
+    threshold = 5*1e-4
+    threshold_type = 1
 
     start = datetime.date(2016, 1, 1)
-    split = datetime.date(2016, 7, 31)
-    end = datetime.date(2016, 10, 31)
+    split = datetime.date(2016, 9, 30)
+    end = datetime.date(2016, 12, 31)
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():

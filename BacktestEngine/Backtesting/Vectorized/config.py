@@ -8,6 +8,7 @@ class Config:
     validate_path = "/home/rz14/Documents/QR_Qishi/Validate/"
     output_path = "/home/rz14/Documents/QR_Qishi/QishiQR/Output/"
 
+    price = "AveragePrice"
     state_number = 3
     max_model_order = 7
     frequency = 5

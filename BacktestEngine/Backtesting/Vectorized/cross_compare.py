@@ -1,15 +1,11 @@
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 
-import importlib
 import Backtesting.Vectorized.backtest
 
-importlib.reload(Backtesting.Vectorized.backtest)
 
-from Utils.IOUtils import *
+from Utils.IOUtils import df_reader
 from Utils.lm import *
-from Backtesting.Vectorized.Strategy import MovingAverageStrategy, SLMStrategy
+from Backtesting.Vectorized.Strategy import SLMStrategy
 from Backtesting.Vectorized.backtest import vectorizedbacktest
 
 
