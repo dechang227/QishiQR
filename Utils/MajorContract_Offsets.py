@@ -130,8 +130,10 @@ class MajorContracts():
                 tick_all.sort_index(inplace=True)
 
                 # create mid price
-                if self._price is 'MidPrice':
-                    tick_all['MidPrice'] = (tick_all['AskPrice1']+tick_all['BidPrice1'])/2.0
+                tick_all['MidPrice'] = (tick_all['AskPrice1']+tick_all['BidPrice1'])/2.0
+                
+                if self._price is 'AvePrice2':
+                    tick_all['AvePrice2'] = (tick_all['AccTurnover']-tick_all['AccTurnover'].shift(1))/(tick_all['AccVolume']-tick_all['AccVolume'].shift(1))
 
                 # create trade direction
                 if self._threshold >= 1:
