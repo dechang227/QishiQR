@@ -20,7 +20,7 @@ def SingleRun(params):
 
     major_series = MajorContracts(symbol=params.symbol, split_time=params.split, 
                                 topdir=params.tick_path, maturity=params.maturity, 
-                                transitions=params.transition, price = params.price,
+                                transitions=params.transition, price = params.TrainPrice,
                                 freq=params.frequency, offset=params.offset)
     mj_train, mj_test, ptb = major_series.create_major_overlap()
 
@@ -30,25 +30,29 @@ def SingleRun(params):
     slm = ptb_df.groupby(['prior']).sum().reset_index()
     slm = SLM(slm, threshold=params.threshold, th_type=params.threshold_type).run()
 
-    signal = MajorSeriesTest(mj_test, params.output_path, slm)
-    signal.build( params.max_model_order, params.offset, params.start.strftime("%Y%m%d"), params.end.strftime("%Y%m%d"), params.tca)
+    tester = MajorSeriesTest(mj_test, params.output_path, slm, price=params.SignalPrice)
+    tester.build( params.max_model_order, params.offset, params.start.strftime("%Y%m%d"), params.end.strftime("%Y%m%d"), params.tca)
 
-    Tester = MajorSeriesTest(mj_test, params.output_path, slm )
-    Tester.build(model_order=params.max_model_order, freq=params.frequency, 
-                start=params.start.strftime("%Y%m%d"), end=params.end.strftime("%Y%m%d"))
+    tester.run()
 
-    Tester.run()
-
-    return Tester
+    return tester
     
 # --------------------------------------------------------------- #
 
 Parameters = {
 
     # Model parameters
-    "frequency": [5, 10, 15, 30],
-    "threshold": [0,5e-4,10e-4,15e-4,25e-4,50e-4],
-    "tca": [-1]
+    "SignalPrice": ["MidPrice"],
+    "TrainPrice":["AvePrice2"],
+    
+    "frequency": [5, ],
+    "threshold": [0,],
+    "tca": [-1],
+    "offset":[0.1,1.1,2.1,3.1,4.1]
+#     "frequency": [5,],
+#     "threshold": [0,],
+#     "tca": [-1]
+
 
 
     ##  Add other parameters below as a dict element. ##

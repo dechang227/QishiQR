@@ -10,7 +10,7 @@ class Config:
     validate_path = "/home/runmin/Documents/Qishi/Validate/"
     output_path = "/home/runmin/Documents/Qishi/QishiQR/Output/"
 
-    price = "LastPrice"
+    price = "AvePrice2"
     state_number = 3
     max_model_order = 7
     frequency = 5
@@ -21,7 +21,7 @@ class Config:
     threshold_type = 1
 
     start = datetime.date(2016, 1, 1)
-    split = datetime.date(2016, 9, 30)
+    split = datetime.date(2016, 10, 1)
     end = datetime.date(2016, 12, 31)
 
     def __init__(self, **kwargs):
