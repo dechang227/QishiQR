@@ -1,0 +1,115 @@
+
+
+{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 0.1}
+====================
+bu1606 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1606 ['2015-11-1', '2016-5-1'] 2016-01-01 00:00:00 2016-03-01 00:00:00
+probability table:  20160104.0 20160229.0
+bu1609 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1609 ['2016-2-1', '2016-8-1'] 2016-03-01 00:00:00 2016-07-01 00:00:00
+probability table:  20160301.0 20160630.0
+bu1612 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1612 ['2016-6-1', '2016-11-15'] 2016-07-01 00:00:00 2016-11-01 00:00:00
+probability table:  20160701 20160930
+bu1706 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00
+
+
+{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 1.1}
+====================
+bu1606 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1606 ['2015-11-1', '2016-5-1'] 2016-01-01 00:00:00 2016-03-01 00:00:00
+probability table:  20160104.0 20160229.0
+bu1609 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1609 ['2016-2-1', '2016-8-1'] 2016-03-01 00:00:00 2016-07-01 00:00:00
+probability table:  20160301 20160630
+bu1612 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1612 ['2016-6-1', '2016-11-15'] 2016-07-01 00:00:00 2016-11-01 00:00:00
+probability table:  20160701 20160930
+bu1706 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00
+
+
+{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 2.1}
+====================
+bu1606 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1606 ['2015-11-1', '2016-5-1'] 2016-01-01 00:00:00 2016-03-01 00:00:00
+probability table:  20160104.0 20160229.0
+bu1609 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1609 ['2016-2-1', '2016-8-1'] 2016-03-01 00:00:00 2016-07-01 00:00:00
+probability table:  20160301 20160630
+bu1612 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1612 ['2016-6-1', '2016-11-15'] 2016-07-01 00:00:00 2016-11-01 00:00:00
+probability table:  20160701 20160930
+bu1706 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00
+
+
+{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 3.1}
+====================
+bu1606 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1606 ['2015-11-1', '2016-5-1'] 2016-01-01 00:00:00 2016-03-01 00:00:00
+probability table:  20160104.0 20160229.0
+bu1609 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1609 ['2016-2-1', '2016-8-1'] 2016-03-01 00:00:00 2016-07-01 00:00:00
+probability table:  20160301 20160630
+bu1612 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1612 ['2016-6-1', '2016-11-15'] 2016-07-01 00:00:00 2016-11-01 00:00:00
+probability table:  20160701 20160930
+bu1706 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00
+
+
+{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 4.1}
+====================
+bu1606 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1606 ['2015-11-1', '2016-5-1'] 2016-01-01 00:00:00 2016-03-01 00:00:00
+probability table:  20160104 20160229
+bu1609 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1609 ['2016-2-1', '2016-8-1'] 2016-03-01 00:00:00 2016-07-01 00:00:00
+probability table:  20160301 20160630
+bu1612 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1612 ['2016-6-1', '2016-11-15'] 2016-07-01 00:00:00 2016-11-01 00:00:00
+probability table:  20160701 20160930
+bu1706 /home/runmin/Documents/Qishi/tick2016//bu
+0
+ID trade_range transition_begin transition_end
+1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00

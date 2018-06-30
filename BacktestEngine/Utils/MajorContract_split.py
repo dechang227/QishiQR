@@ -137,11 +137,20 @@ class MajorContracts():
             tick_all = pd.concat([tick_day, tick_night])
             tick_all.sort_index(inplace=True)
 
+            # create mid price
+            tick_all['MidPrice'] = (tick_all['AskPrice1'] + tick_all['BidPrice1']) / 2.0
+
+            if self._price is 'AvePrice2':
+                tick_all['AvePrice2'] = (tick_all['AccTurnover']-tick_all['AccTurnover'].shift(1))/(tick_all['AccVolume']-tick_all['AccVolume'].shift(1))
+
             # create trade direction
-            if self._price is 'MidPrice':
-                tick_all['MidPrice'] = (tick_all['AskPrice1'] + tick_all['BidPrice1']) / 2.0
-            tick_all['Direction'] = tick_all[self._price].pct_change().apply(
-                lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
+
+                
+            if self._price_threshold >= 1:
+                tick_all['Direction'] = tick_all[self._price].diff().apply(
+                        lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
+            else:
+                tick_all['Direction'] = tick_all[self._price].pct_change().apply(lambda x: 2 if x > self._price_threshold else (1 if x < -self._price_threshold else 0))
             print(self._price_threshold)
             # slice major contracts trading period
             assert pd.to_datetime(self._transitions[exp]) < pd.to_datetime(trade_range[1]) and pd.to_datetime(
