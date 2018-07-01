@@ -1,6 +1,6 @@
 
 
-{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 0.1}
+{'SignalPrice': 'AvePrice2', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 0.1}
 ====================
 bu1606 /home/runmin/Documents/Qishi/tick2016//bu
 0
@@ -23,7 +23,7 @@ ID trade_range transition_begin transition_end
 1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00
 
 
-{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 1.1}
+{'SignalPrice': 'AvePrice2', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 1.1}
 ====================
 bu1606 /home/runmin/Documents/Qishi/tick2016//bu
 0
@@ -46,7 +46,7 @@ ID trade_range transition_begin transition_end
 1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00
 
 
-{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 2.1}
+{'SignalPrice': 'AvePrice2', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 2.1}
 ====================
 bu1606 /home/runmin/Documents/Qishi/tick2016//bu
 0
@@ -69,7 +69,7 @@ ID trade_range transition_begin transition_end
 1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00
 
 
-{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 3.1}
+{'SignalPrice': 'AvePrice2', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 3.1}
 ====================
 bu1606 /home/runmin/Documents/Qishi/tick2016//bu
 0
@@ -92,7 +92,7 @@ ID trade_range transition_begin transition_end
 1706 ['2016-10-15', '2017-1-31'] 2016-11-01 00:00:00 2016-12-31 00:00:00
 
 
-{'SignalPrice': 'MidPrice', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 4.1}
+{'SignalPrice': 'AvePrice2', 'TrainPrice': 'AvePrice2', 'frequency': 5, 'threshold': 0, 'tca': -1, 'offset': 4.1}
 ====================
 bu1606 /home/runmin/Documents/Qishi/tick2016//bu
 0

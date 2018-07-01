@@ -42,7 +42,7 @@ def SingleRun(params):
 Parameters = {
 
     # Model parameters
-    "SignalPrice": ["MidPrice"],
+    "SignalPrice": ["AvePrice2"],
     "TrainPrice":["AvePrice2"],
     
     "frequency": [5, ],
