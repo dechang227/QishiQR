@@ -9,9 +9,11 @@ class Config:
     strategy_path = "/home/runmin/Documents/Qishi/Strategy/"
     validate_path = "/home/runmin/Documents/Qishi/Validate/"
     output_path = "/home/runmin/Documents/Qishi/QishiQR/Output/"
-
-    SignalPrice = "AvePrice2"
+    
     TrainPrice="AvePrice2"
+    SignalPrice = "AvePrice2"
+    TestPrice = "MidPrice"
+    
     state_number = 3
     max_model_order = 7
     frequency = 5

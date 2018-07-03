@@ -30,7 +30,7 @@ def SingleRun(params):
     slm = ptb_df.groupby(['prior']).sum().reset_index()
     slm = SLM(slm, threshold=params.threshold, th_type=params.threshold_type).run()
 
-    tester = MajorSeriesTest(mj_test, params.output_path, slm, price=params.SignalPrice)
+    tester = MajorSeriesTest(mj_test, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice)
     tester.build( params.max_model_order, params.offset, params.start.strftime("%Y%m%d"), params.end.strftime("%Y%m%d"), params.tca)
 
     tester.run()
@@ -44,6 +44,7 @@ Parameters = {
     # Model parameters
     "SignalPrice": ["AvePrice2"],
     "TrainPrice":["AvePrice2"],
+    "TestPrice":["MidPrice"],
     
     "frequency": [5, ],
     "threshold": [0,],

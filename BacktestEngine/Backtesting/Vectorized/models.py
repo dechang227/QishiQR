@@ -123,7 +123,8 @@ class MajorSeriesTest:
     Test ONE major series with different orders
     """
 
-    def __init__(self, major_series, OUTPUT_DIR, prob_table, price='LastPrice', px_th=0.0):
+    def __init__(self, major_series, OUTPUT_DIR, prob_table, signal_price='AvePrice2', 
+                 test_price='MidPrice', px_th=0.0):
         """
         Read in Data and the probability table
 
@@ -137,14 +138,15 @@ class MajorSeriesTest:
         self.signals = None
         self.prob_table = prob_table
         self._price_threshold = px_th
-        self.price = price
+        self.signal_price = signal_price
+        self.test_price = test_price
 
-    def compile_signal(self, data, slm, model_orders, price='LastPrice'):
+    def compile_signal(self, data, slm, model_orders):
         """
         Generate signals for different orders
         """
 
-        signals = [SLMStrategy(data, slm, m, price=price, px_th=self._price_threshold).generatingsignal() for m in
+        signals = [SLMStrategy(data, slm, m, price=self.signal_price, px_th=self._price_threshold).generatingsignal() for m in
                    range(1, model_orders + 1)]
 
         return signals
@@ -157,8 +159,8 @@ class MajorSeriesTest:
             model_order: int or list. Number of model orders
         """
         self.test_data = self.test_data[(self.test_data.index >= start) & (self.test_data.index < end)]
-        self.signals = self.compile_signal(self.test_data, self.prob_table, model_orders=model_order, price=self.price)
-        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, price=self.price)
+        self.signals = self.compile_signal(self.test_data, self.prob_table, model_orders=model_order)
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, price=self.test_price)
         self.ensemble.build()
 
     def run(self):
