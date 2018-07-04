@@ -1,0 +1,12 @@
+{
+    "symbol": ["bu"],
+
+    "SignalPrice": ["AvePrice2"],
+    "TrainPrice":["AvePrice2"],
+    "TestPrice":["MidPrice"],
+
+    "frequency": [5],
+    "threshold": [0],
+    "tca": [-1],
+    "offset":[0.1]
+}
