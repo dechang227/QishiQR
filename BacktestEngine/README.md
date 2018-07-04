@@ -11,8 +11,8 @@ python Main.py -o PATH_TO_OUTPUT -c PATH_TO_CONFIG
 ```
 
 where:  
-`PATH_TO_OUTPUT`: a folder to save backtest files (`pickle` files). Default valule is `./Results`
-`PATH_TO_CONFIG`: path to the configuration file. Default configurations can be found in `main.py`
+`PATH_TO_OUTPUT`: a folder to save backtest files (`pickle` files). Default valule is `./Results`  
+`PATH_TO_CONFIG`: path to the configuration file. Default configurations can be found in `main.py`  
 
 ## Configuration file
 Put them 
