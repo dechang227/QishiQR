@@ -25,10 +25,16 @@ Format
     "TrainPrice":["AvePrice2"],
     "TestPrice":["MidPrice"],
 
-    "frequency": [5, 10, 15],
-    "threshold": [0],
-    "tca": [-1],
-    "offset":[0.1]
+    "frequency": [5, 10, 15],           // Sample frequency
+    "threshold": [0],                   // Threshold value
+    "threshold_type":[1],               // Threshold type used in Backtesting.Vectorized.Strategy.SLM
+    "tca": [-1],                        // Trading costs: -1, 'fixed', 'spread'
+    "offset":[0.1],                     // Offset
+
+    "start": ["2016-01-01"],            // start time
+    "split": ["2016-07-01"],            // Train-valid split time
+    "valid_split": ["2016-10-01"],      // Valid-test split time
+    "end": ["2016-12-31"]               // End date
 }
 ```
 
