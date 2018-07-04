@@ -1,5 +1,5 @@
 {
-    "symbol": ["Rb"],
+    "symbol": ["rb"],
 
     "SignalPrice": ["AvePrice2"],
     "TrainPrice":["AvePrice2"],

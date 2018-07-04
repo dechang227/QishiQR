@@ -1,11 +1,11 @@
 {
-    "symbol": ["Rb"],
+    "symbol": ["rb"],
 
     "SignalPrice": ["AvePrice2"],
     "TrainPrice":["AvePrice2"],
     "TestPrice":["MidPrice"],
 
-    "frequency": [5],
+    "frequency": [10],
     "threshold": [0],
     "threshold_type": [1], 
     "tca": [-1],
