@@ -39,10 +39,12 @@ if not args.configFile:
         "frequency": [5, ],
         "threshold": [0,],
         "tca": [-1],
-        "offset":[0.1,]
-        # "frequency": [5,],
-        # "threshold": [0,],
-        # "tca": [-1]
+        "offset":[0.1,],
+
+        "start": ["2016-01-01"],
+        "split": ["2016-07-01"],
+        "valid_split": ["2016-10-01"],
+        "end": ["2016-12-31"]
 
         ##  Add other parameters below as a dict element. ##
 
@@ -71,24 +73,32 @@ except NotImplementedError:
 
 # --------------- Helper function used ---------------------------- #
 
-def SingleRun(params):
+def SingleRun(params, TesterType='Insample'):
     #  Run 
     major_series = MajorContracts(symbol=params.symbol, split_time=params.split, 
                                 topdir=params.tick_path, maturity=params.maturity, 
                                 transitions=params.transition, price = params.TrainPrice,
                                 freq=params.frequency, offset=params.offset)
-    mj_train, mj_test, ptb = major_series.create_major_overlap()
 
+    mj_train, mj_test, ptb = major_series.create_major_overlap()
+    mj_val = mj_test[mj_test.index <= params.valid_split]
+    mj_test = mj_test[mj_test.index > params.valid_split]
 
     ptb_df = pd.concat(ptb)
     ptb_df.index = ptb_df.index.droplevel(level=0).set_names('RawPrior')
     slm = ptb_df.groupby(['prior']).sum().reset_index()
     slm = SLM(slm, threshold=params.threshold, th_type=params.threshold_type).run()
 
-    tester = MajorSeriesTest(mj_test, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice)
-    tester.build( params.max_model_order, params.offset, params.start.strftime("%Y%m%d"), params.end.strftime("%Y%m%d"), params.tca)
+    tester = {
+        "insample": MajorSeriesTest(mj_val, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice),
+        "outsample": MajorSeriesTest(mj_test, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice)
+    }
 
-    tester.run()
+    tester["insample"].build( params.max_model_order, params.offset, params.start, params.end, params.tca)
+    tester["insample"].run()
+    tester["outsample"].build( params.max_model_order, params.offset, params.start, params.end, params.tca)
+    tester["outsample"].run()
+
 
     return tester
 
@@ -112,8 +122,10 @@ for idx, paras in enumerate(product(*Parameters.values())):
     print(current_params)
     print("="*20)
 
+    singleRunResult = SingleRun(params)
     Results = {
-        "model": SingleRun(params),
+        "insample": singleRunResult["insample"],
+        "outsample": singleRunResult["outsample"],
         "globalPara": params,
         "localPara": current_params
     }

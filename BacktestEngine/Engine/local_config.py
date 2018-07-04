@@ -23,9 +23,15 @@ class Config:
     threshold = 5*1e-4
     threshold_type = 1
 
-    start = datetime.date(2016, 1, 1)
-    split = datetime.date(2016, 10, 1)
-    end = datetime.date(2016, 12, 31)
+    # start = datetime.date(2016, 1, 1)
+    # split = datetime.date(2016, 7, 1)
+    # valid_split = datetime.date(2016, 10, 1)
+    # end = datetime.date(2016, 12, 31)
+
+    start = "2016-01-01"
+    split = "2016-07-01"
+    valid_split = "2016-10-01"
+    end = "2016-12-31"
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
