@@ -138,5 +138,4 @@ class ZnConfig(Config):
     }
 
     def __init__(self, **kwargs):
-        raise NotImplementedError
-        # super(ZnConfig, self).__init__(**kwargs)
+        super(ZnConfig, self).__init__(**kwargs)
