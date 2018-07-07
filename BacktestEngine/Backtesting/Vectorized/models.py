@@ -151,7 +151,7 @@ class MajorSeriesTest:
 
         return signals
 
-    def build(self, model_order=7, freq='5min', start='20161001', end='20161221', offset=0, tca=None):
+    def build(self, model_order=7, freq='5min', start='20161001', end='20161221', offset=0, tca=None, fixed_cost = 0.0002):
         """
         Read in Data and the probability table
 
@@ -160,7 +160,7 @@ class MajorSeriesTest:
         """
         self.test_data = self.test_data[(self.test_data.index >= start) & (self.test_data.index < end)]
         self.signals = self.compile_signal(self.test_data, self.prob_table, model_orders=model_order)
-        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, price=self.test_price)
+        self.ensemble = ensembler(vectorizedbacktest, self.signals, tcas=tca, price=self.test_price, fixed_cost = fixed_cost)
         self.ensemble.build()
 
     def run(self):

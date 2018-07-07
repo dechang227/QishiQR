@@ -6,9 +6,11 @@
     "TestPrice":["MidPrice"],
 
     "frequency": [5],
+    "price_thresohold": [5*1e-4],
     "threshold": [0],
     "threshold_type": [1], 
     "tca": [-1],
+    "fixed_cost": [0.0002],
     "offset":[0.1],
 
     "start": ["2016-01-01"],

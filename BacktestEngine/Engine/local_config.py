@@ -19,9 +19,11 @@ class Config:
     frequency = 5
     offset = 0
     tca = -1
+    fixed_cost = 0.0002
   
-    threshold = 5*1e-4
-    threshold_type = 1
+    price_threshold = 5*1e-4
+    threshold = 0
+    threshold_type = 0
 
     # start = datetime.date(2016, 1, 1)
     # split = datetime.date(2016, 7, 1)

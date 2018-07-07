@@ -78,7 +78,7 @@ def SingleRun(params, TesterType='Insample'):
     major_series = MajorContracts(symbol=params.symbol, split_time=params.split, 
                                 topdir=params.tick_path, maturity=params.maturity, 
                                 transitions=params.transition, price = params.TrainPrice,
-                                freq=params.frequency, offset=params.offset)
+                                freq=params.frequency, offset=params.offset, px_th = params.price_threshold)
 
     mj_train, mj_test, ptb = major_series.create_major_overlap()
     mj_val = mj_test[mj_test.index <= params.valid_split]
@@ -90,13 +90,13 @@ def SingleRun(params, TesterType='Insample'):
     slm = SLM(slm, threshold=params.threshold, th_type=params.threshold_type).run()
 
     tester = {
-        "insample": MajorSeriesTest(mj_val, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice),
-        "outsample": MajorSeriesTest(mj_test, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice)
+        "insample": MajorSeriesTest(mj_val, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice, px_th = params.price_threshold),
+        "outsample": MajorSeriesTest(mj_test, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice, px_th = params.price_threshold)
     }
 
-    tester["insample"].build( params.max_model_order, params.offset, params.start, params.end, params.tca)
+    tester["insample"].build( params.max_model_order, params.offset, params.start, params.end, params.tca, params.fixed_cost)
     tester["insample"].run()
-    tester["outsample"].build( params.max_model_order, params.offset, params.start, params.end, params.tca)
+    tester["outsample"].build( params.max_model_order, params.offset, params.start, params.end, params.tca, params.fixed_cost)
     tester["outsample"].run()
 
 
