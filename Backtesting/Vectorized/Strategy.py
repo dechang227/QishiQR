@@ -93,7 +93,7 @@ class SLMStrategy:
 
 
 class SLM:
-    def __init__(self, slm, threshold, th_type=1):
+    def __init__(self, slm, threshold, th_type=0):
         self._slm = copy.deepcopy(slm)
         self._threshold = threshold
         self._type = th_type
@@ -109,13 +109,13 @@ class SLM:
         self._slm = self._slm.sort_values(by='order').reset_index(drop=True)#.drop(columns=['index'])
         assert self._threshold < 1
         if self._type == 1:
-            # type 1: simple threshold cutoff
+            # type 1: simple threshold cutoff, 0.5
             self._slm['signal'] = self._slm[['max', 'max_pct']].apply(lambda x: x['max'] if x['max_pct'] > self._threshold else 0, axis=1).astype(int)
         elif self._type == 2:
-            # type 2: threshold for the difference of top 2 probs
+            # type 2: threshold for the difference of top 2 probs, 0.1
             self._slm['signal'] = self._slm.apply(lambda x: x['max'] if x['threshold'] > self._threshold else 0, axis=1).astype(int)
         elif self._type == 3:
-            # type 3: consider only threshold for case of 1 and 2 are top 2 probs
+            # type 3: consider only threshold for case of 1 and 2 are top 2 probs, 0.1
             self._slm['signal'] = self._slm.apply(lambda x: 0 if (x['threshold'] <= self._threshold and x['min'] == '0') else x['max'], axis=1).astype(int)
         else:
             self._slm['signal'] = self._slm['max']
