@@ -44,11 +44,13 @@ class OffSetAverage:
             for single_offset_data in self.Tester_Results:
                 for model_order, data in enumerate(single_offset_data[DataType].ensemble.ensembles, start=2):
                     try:
-                        StrategyReturn[model_order] += data.result.strategy.values/totalNum_of_Offset
+                        StrategyReturn[model_order] = StrategyReturn[model_order].add(data.result.strategy.reset_index(drop=True)/totalNum_of_Offset, fill_value=0)
                     except KeyError:
+                        TimeIndex = data.result.index
                         StrategyReturn[model_order] = data.result.strategy.values/totalNum_of_Offset
-                        StrategyReturn.index = data.result.index
-                        StrategyReturn.index.name='Date'
+
+            StrategyReturn.index = TimeIndex
+            StrategyReturn.index.name='Date'
             
             self.AveEquityCurve[DataType] = (StrategyReturn+1).cumprod()
         return self.AveEquityCurve
