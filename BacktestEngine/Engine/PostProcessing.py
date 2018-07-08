@@ -32,8 +32,8 @@ class OffSetAverage:
         self.Benchmark = {'insample':None, 'outsample':None}
 
     def GetBenchmark(self):
-        self.Benchmark['insample'] = self.Tester_Results[-1]["insample"].ensemble.ensembles[0].result.benchmark
-        self.Benchmark['outsample'] = self.Tester_Results[-1]["outsample"].ensemble.ensembles[0].result.benchmark
+        self.Benchmark['insample'] = self.Tester_Results[0]["insample"].ensemble.ensembles[0].result.benchmark
+        self.Benchmark['outsample'] = self.Tester_Results[0]["outsample"].ensemble.ensembles[0].result.benchmark
         return self.Benchmark
     
     def GetAveEquityCurve(self):
