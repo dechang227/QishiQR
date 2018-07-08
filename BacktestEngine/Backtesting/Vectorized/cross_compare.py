@@ -7,7 +7,7 @@ from Utils.IOUtils import df_reader
 from Utils.lm import *
 from Backtesting.Vectorized.Strategy import SLMStrategy
 from Backtesting.Vectorized.backtest import vectorizedbacktest
-
+from itertools import product
 
 class ensembler:
     def __init__(self, tester, signals, price='LastPrice', tcas=None, labels=None, fixed_cost=0.00052):
