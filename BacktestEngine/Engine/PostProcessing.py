@@ -30,6 +30,7 @@ class OffSetAverage:
         self.Tester_Results = Tester_Results
         self.AveEquityCurve = {'insample':None, 'outsample':None}
         self.Benchmark = {'insample':None, 'outsample':None}
+        self.AvePerformance = {'insample':0, 'outsample':0}
 
     def GetBenchmark(self):
         self.Benchmark['insample'] = self.Tester_Results[0]["insample"].ensemble.ensembles[0].result.benchmark
@@ -54,3 +55,12 @@ class OffSetAverage:
             
             self.AveEquityCurve[DataType] = (StrategyReturn+1).cumprod()
         return self.AveEquityCurve
+
+    def GetAvePerformance(self):
+        totalNum_of_Offset =len(self.Tester_Results)
+        for DataType in ['insample', 'outsample']:
+            tmp_Performance = 0
+            for idx,single_offset_data in enumerate(self.Tester_Results):
+                tmp_Performance += single_offset_data[DataType].performance
+            self.AvePerformance[DataType] = tmp_Performance/ totalNum_of_Offset
+        return self.AvePerformance
