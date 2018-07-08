@@ -10,12 +10,13 @@ class Config:
     validate_path = "/home/runmin/Documents/Qishi/Validate/"
     output_path = "/home/runmin/Documents/Qishi/QishiQR/Output/"
     
+    
     TrainPrice="AvePrice2"
     SignalPrice = "AvePrice2"
     TestPrice = "MidPrice"
     
     state_number = 3
-    max_model_order = 7
+    max_model_order = 8
     frequency = 5
     offset = 0
     tca = -1

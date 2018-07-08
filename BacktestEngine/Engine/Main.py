@@ -29,7 +29,7 @@ output_dir = args.output_dir
 
 if not args.configFile:
     Parameters = {
-        'symbol': 'bu',
+        'symbol': ['bu'],
 
         # Model parameters
         "SignalPrice": ["AvePrice2"],
@@ -94,9 +94,9 @@ def SingleRun(params, TesterType='Insample'):
         "outsample": MajorSeriesTest(mj_test, params.output_path, slm, signal_price=params.SignalPrice, test_price=params.TestPrice, px_th = params.price_threshold)
     }
 
-    tester["insample"].build( params.max_model_order, params.offset, params.start, params.end, params.tca, params.fixed_cost)
+    tester["insample"].build(params.max_model_order, params.frequency, params.start, params.end, params.offset, params.tca, params.fixed_cost)
     tester["insample"].run()
-    tester["outsample"].build( params.max_model_order, params.offset, params.start, params.end, params.tca, params.fixed_cost)
+    tester["outsample"].build(params.max_model_order, params.frequency, params.start, params.end, params.offset, params.tca, params.fixed_cost)
     tester["outsample"].run()
 
 
