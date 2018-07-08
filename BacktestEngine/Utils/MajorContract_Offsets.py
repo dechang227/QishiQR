@@ -24,7 +24,7 @@ class MajorContracts():
         self._split_time = pd.to_datetime(split_time)
         self._offset  = kwargs.get('offset', [0.2])
         self._freq    = kwargs.get('freq', 15)       
-        self._threshold = kwargs.get('threshold', 5.e-4)  # threshold for state change: default to 5 bps
+        self._threshold = kwargs.get('px_th', 5.e-4)  # threshold for state change: default to 5 bps
         
         # transition time between major contracts. eg, 'transitions' = {'1605': '2016-2-1', ...}
         self._transitions  = kwargs.get('transitions', None)  
