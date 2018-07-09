@@ -6,9 +6,10 @@ import pickle
 import matplotlib.pyplot as plt
 import Backtesting
 import pandas as pd
+import re
 
 def GetResult(RESULT_DIR):
-    files = sorted(glob(RESULT_DIR+"/*.pkl"))
+    files = sorted(glob(RESULT_DIR+"/*.pkl"), key=lambda x: int(re.findall('Result_(\d+)',x)[0]))
 
     Tester_Results = []
     file_path = []
