@@ -1,0 +1,22 @@
+{
+    "symbol": ["ru"],
+
+    "SignalPrice": ["AvePrice2"],
+    "TrainPrice":["AvePrice2"],
+    "TestPrice":["MidPrice"],
+
+    
+    "price_threshold":[10e-4, 5e-4, 0, 5, 10],
+    "threshold": [0],
+    "threshold_type": [1], 
+    "tca": ["Fixed"],
+    "fixed_cost":[0],
+
+    "frequency": [5],
+    "offset":[0.1, 1.1, 2.1, 3.1, 4.1],
+
+    "start": ["2016-01-01"],
+    "split": ["2016-07-01"],
+    "valid_split": ["2016-10-01"],
+    "end": ["2016-12-31"]
+}
